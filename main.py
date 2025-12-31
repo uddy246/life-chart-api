@@ -1,8 +1,20 @@
 from fastapi import FastAPI
 from datetime import datetime
+from fastapi.middleware.cors import CORSMiddleware
+
 import re
 
 app = FastAPI(title="Life Chart API")
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # temporary: allow all origins so the Lovable frontend can call the API
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 
 # -------------------------
