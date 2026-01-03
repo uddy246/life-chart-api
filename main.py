@@ -78,7 +78,9 @@ def numerology_from_name_and_dob(full_name: str, dob_str: str) -> dict:
     Returns:
       - life_path
       - birthday
+      - attitude
       - expression_destiny
+      - maturity
       - soul_urge
       - personality
     """
@@ -110,6 +112,9 @@ def numerology_from_name_and_dob(full_name: str, dob_str: str) -> dict:
     # Birthday number: reduce day of month
     birthday = _reduce_number(dob.day, keep_master=True)
 
+    # Attitude number: reduce month + day
+    attitude = _reduce_number(dob.month + dob.day, keep_master=True)
+
     # Name numbers
     expression_total = _sum_letters(name_clean, "all")
     soul_total = _sum_letters(name_clean, "vowels")
@@ -119,12 +124,20 @@ def numerology_from_name_and_dob(full_name: str, dob_str: str) -> dict:
     soul_urge = _reduce_number(soul_total, keep_master=True) if name_clean else None
     personality = _reduce_number(personality_total, keep_master=True) if name_clean else None
 
+    maturity = (
+        _reduce_number(life_path + expression_destiny, keep_master=True)
+        if life_path is not None and expression_destiny is not None
+        else None
+    )
+
     return {
         "life_path": life_path,
         "expression_destiny": expression_destiny,
+        "maturity": maturity,
         "soul_urge": soul_urge,
         "personality": personality,
         "birthday": birthday,
+        "attitude": attitude,
     }
 
 
@@ -140,6 +153,116 @@ def _get_first(payload: dict, keys: list[str]) -> str | None:
 def health():
     return {"status": "ok"}
 
+def render_profile_markdown(full_name: str, astrology: dict, numerology: dict) -> str:
+    # Minimal v1 formatter: uses what we currently have, keeps bounded language where needed.
+    # We will expand this to your full strict spec once the pipeline is proven.
+    sun_tropical = astrology.get("western_sun_sign", "Unknown")
+    sun_sidereal = astrology.get("vedic_sun_sign", "Unknown")
+    chinese = astrology.get("chinese_zodiac", "Unknown")
+
+    life_path = numerology.get("life_path", "Unknown")
+    birth_day = numerology.get("birthday", "Unknown")
+    attitude = numerology.get("attitude", "Unknown")
+    expression = numerology.get("expression_destiny", "Unknown")
+    soul_urge = numerology.get("soul_urge", "Unknown")
+    personality = numerology.get("personality", "Unknown")
+    maturity = numerology.get("maturity", "Unknown")
+
+    return f"""# PROFILE: **{full_name or "Unknown"}**
+
+---
+
+## ASTROLOGY
+
+---
+
+### A. Western Astrology (Tropical)
+
+#### Sun: **{sun_tropical}**
+- Core identity: High-confidence interpretation based on Sun sign only.
+- Strength expression: Likely strengths aligned with {sun_tropical} themes.
+- Friction points: Common {sun_tropical} pitfalls under stress.
+- Time-of-day influence: Not assessed without confirmed Moon/Ascendant.
+
+---
+
+### B. Vedic Astrology (Sidereal)
+
+#### Sun: **{sun_sidereal}**
+- Core orientation: High-confidence interpretation based on sidereal Sun sign only.
+- Strength expression: Likely strengths aligned with {sun_sidereal} themes.
+- Friction points: Common {sun_sidereal} pitfalls under stress.
+
+---
+
+#### Lunar Nakshatra + Pada (Vedic)
+**High-likelihood Nakshatra:** **Not yet computed**
+**Likely Pada band:** **Not yet computed**
+- Bounded interpretation will be added once nakshatra computation is implemented.
+
+---
+
+### C. Chinese Astrology  
+*(Vietnamese zodiac is included here, as it is structurally the same system)*
+
+#### Chinese Zodiac: **{chinese}**
+- Temperament/strategy: High-confidence interpretation based on year animal only.
+- Shadow tendencies: Common challenges associated with {chinese} patterns.
+
+---
+
+#### C1. BaZi (Four Pillars of Destiny) - *Chinese Astrology Subsystem*
+**Day Master (Core Self):** **Not yet computed**
+- Pillars/day master will be added once BaZi computation is implemented.
+
+---
+
+### ASTROLOGICAL CONVERGENT SUMMARY
+- Not yet computed (requires multi-system trait extraction and overlap logic).
+
+---
+
+## NUMEROLOGY
+
+### Life Path Number: **{life_path}**
+- Themes: High-confidence themes based on Life Path.
+- Risks: Typical overuse/underuse patterns for this number.
+
+### Birth Day Number: **{birth_day}**
+- Supports the Life Path with more specific behavioural tendencies.
+
+### Attitude Number: **{attitude}**
+- Derived from DOB (month + day); reflects the immediate "first impression" style.
+
+### Expression / Destiny Number: **{expression}**
+- Themes: High-confidence themes based on name-derived total.
+
+### Soul Urge / Heart's Desire: **{soul_urge}**
+- Motivational drivers inferred from vowel total.
+
+### Personality Number: **{personality}**
+- Social presentation inferred from consonant total.
+
+### Maturity Number: **{maturity}**
+- Derived from Life Path + Expression; reflects the longer-term direction of development.
+
+---
+
+### NUMEROLOGICAL CONCLUSION
+Numerology is partially computed (core numbers are present). Additional numbers will be added next to complete the profile.
+
+---
+
+## COMBINED ASTROLOGY + NUMEROLOGY SUMMARY
+- Not yet computed (requires overlap logic across systems and numerology themes).
+
+---
+
+## FINAL CONCLUSION  
+### **Archetype: *Not yet assigned***
+This profile is currently based on a subset of computed factors. Once the remaining systems are computed, the archetype and convergent summaries will be generated consistently.
+"""
+
 
 @app.post("/profile/compute")
 def compute_profile(payload: dict):
@@ -151,15 +274,20 @@ def compute_profile(payload: dict):
     numerology = numerology_from_name_and_dob(full_name, dob_str)
 
     # Keep astrology placeholders for now (unchanged)
+    astrology = {
+        "western_sun_sign": "Pisces",
+        "vedic_sun_sign": "Aquarius",
+        "chinese_zodiac": "Dragon",
+        "celtic_tree_sign": "Ash",
+        "mayan_zodiac": "Jaguar"
+    }
+
+    profile_markdown = render_profile_markdown(full_name, astrology, numerology)
+
     return {
-        "astrology": {
-            "western_sun_sign": "Pisces",
-            "vedic_sun_sign": "Aquarius",
-            "chinese_zodiac": "Dragon",
-            "celtic_tree_sign": "Ash",
-            "mayan_zodiac": "Jaguar"
-        },
+        "astrology": astrology,
         "numerology": numerology,
+        "profile_markdown": profile_markdown,
         "unified_overlapping_traits": [
             {
                 "title": "Intuitive",
