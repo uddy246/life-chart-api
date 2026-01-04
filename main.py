@@ -3,6 +3,7 @@ from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 
 import re
+import swisseph as swe
 
 app = FastAPI(title="Life Chart API")
 
@@ -149,6 +150,91 @@ def _get_first(payload: dict, keys: list[str]) -> str | None:
     return None
 
 
+_SIGNS = [
+    "Aries",
+    "Taurus",
+    "Gemini",
+    "Cancer",
+    "Leo",
+    "Virgo",
+    "Libra",
+    "Scorpio",
+    "Sagittarius",
+    "Capricorn",
+    "Aquarius",
+    "Pisces",
+]
+
+
+def _sign_from_longitude(lon: float) -> str:
+    idx = int(lon // 30) % 12
+    return _SIGNS[idx]
+
+
+def compute_sun_signs(dob_str: str) -> tuple[str | None, str | None]:
+    dob = None
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y"):
+        try:
+            dob = datetime.strptime(dob_str, fmt).date()
+            break
+        except Exception:
+            continue
+
+    if dob is None:
+        return (None, None)
+
+    try:
+        jd = swe.julday(dob.year, dob.month, dob.day, 12.0)
+        lon = swe.calc_ut(jd, swe.SUN)[0][0]
+        tropical = _sign_from_longitude(lon)
+
+        swe.set_sid_mode(swe.SIDM_LAHIRI)
+        ayan = swe.get_ayanamsa_ut(jd)
+        sid_lon = (lon - ayan) % 360
+        vedic = _sign_from_longitude(sid_lon)
+    except Exception:
+        return (None, None)
+
+    return (tropical, vedic)
+
+
+_CHINESE_ZODIAC = [
+    "Rat",
+    "Ox",
+    "Tiger",
+    "Rabbit",
+    "Dragon",
+    "Snake",
+    "Horse",
+    "Goat",
+    "Monkey",
+    "Rooster",
+    "Dog",
+    "Pig",
+]
+
+
+def compute_chinese_zodiac(dob_str: str) -> str | None:
+    dob = None
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y"):
+        try:
+            dob = datetime.strptime(dob_str, fmt).date()
+            break
+        except Exception:
+            continue
+
+    if dob is None:
+        return None
+
+    year = dob.year
+    if (dob.month, dob.day) < (2, 4):
+        year -= 1
+
+    base_year = 2008
+    idx = (year - base_year) % 12
+    return _CHINESE_ZODIAC[idx]
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -156,9 +242,9 @@ def health():
 def render_profile_markdown(full_name: str, astrology: dict, numerology: dict) -> str:
     # Minimal v1 formatter: uses what we currently have, keeps bounded language where needed.
     # We will expand this to your full strict spec once the pipeline is proven.
-    sun_tropical = astrology.get("western_sun_sign", "Unknown")
-    sun_sidereal = astrology.get("vedic_sun_sign", "Unknown")
-    chinese = astrology.get("chinese_zodiac", "Unknown")
+    sun_tropical = astrology.get("western_sun_sign") or "Unknown"
+    sun_sidereal = astrology.get("vedic_sun_sign") or "Unknown"
+    chinese = astrology.get("chinese_zodiac") or "Unknown"
 
     life_path = numerology.get("life_path", "Unknown")
     birth_day = numerology.get("birthday", "Unknown")
@@ -273,13 +359,16 @@ def compute_profile(payload: dict):
     # Compute real numerology
     numerology = numerology_from_name_and_dob(full_name, dob_str)
 
-    # Keep astrology placeholders for now (unchanged)
+    trop, ved = compute_sun_signs(dob_str)
+    cz = compute_chinese_zodiac(dob_str)
     astrology = {
-        "western_sun_sign": "Pisces",
-        "vedic_sun_sign": "Aquarius",
-        "chinese_zodiac": "Dragon",
-        "celtic_tree_sign": "Ash",
-        "mayan_zodiac": "Jaguar"
+        "western_sun_sign": trop,
+        "vedic_sun_sign": ved,
+        "chinese_zodiac": cz,
+        "lunar_nakshatra": None,
+        "lunar_pada": None,
+        "bazi_day_master": None,
+        "bazi_pillars": None,
     }
 
     profile_markdown = render_profile_markdown(full_name, astrology, numerology)
