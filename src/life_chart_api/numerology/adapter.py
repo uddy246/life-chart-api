@@ -4,10 +4,14 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 from life_chart_api.numerology.compute import PrimitiveResult, compute_primitives_v1
+from life_chart_api.numerology.interpretation import generate_claims, generate_signals
 from life_chart_api.numerology.utils import normalize_name
 from life_chart_api.numerology.schemas import (
+    EvidenceItem,
+    NumerologyClaim,
     NumerologyInputs,
     NumerologyResponseV1,
+    NumerologySignal,
     NumerologySystemMeta,
     PrimitiveFlagsModel,
     PrimitiveModel,
@@ -63,6 +67,22 @@ def build_numerology_response_v1(
         k: _to_primitive_model(v) for k, v in primitives_dc.items()
     }
 
+    signals_raw = generate_signals(primitives_dc)
+    claims_raw = generate_claims(primitives_dc)
+
+    signals = [NumerologySignal(**s) for s in signals_raw]
+    claims: list[NumerologyClaim] = []
+    for c in claims_raw:
+        evidence = [EvidenceItem(**e) for e in c.get("evidence", [])]
+        claims.append(
+            NumerologyClaim(
+                layer=c["layer"],
+                layer_label=c["layer_label"],
+                text=c["text"],
+                evidence=evidence,
+            )
+        )
+
     return NumerologyResponseV1(
         system_meta=NumerologySystemMeta(),
         inputs=NumerologyInputs(
@@ -73,4 +93,6 @@ def build_numerology_response_v1(
             forecast_year=forecast_year,
         ),
         primitives=primitives,
+        signals=signals,
+        claims=claims,
     )

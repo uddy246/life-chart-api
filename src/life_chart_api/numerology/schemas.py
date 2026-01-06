@@ -75,14 +75,34 @@ class NumerologyInputs(BaseModel):
     as_of_date: Optional[str] = None
     forecast_year: Optional[int] = None
 
+class EvidenceItem(StrictBaseModel):
+    source_key: str
+    number: int
 
-class NumerologyResponseV1(BaseModel):
-    """
-    v1 response: includes meta, inputs, primitives.
-    We will add signals/claims/synthesis in later iterations.
-    """
-    model_config = ConfigDict(extra="forbid")
 
+class NumerologySignal(StrictBaseModel):
+    signal_id: str
+    source_key: str
+    number: int
+    base_number: Optional[int] = None
+    primary_layer: int
+    functions: List[str]
+    healthy_expression: List[str]
+    stress_expression: List[str]
+    growth_tension: List[Dict[str, Any]]
+
+
+class NumerologyClaim(StrictBaseModel):
+    layer: int
+    layer_label: str
+    text: str
+    evidence: List[EvidenceItem]
+
+
+class NumerologyResponseV1(StrictBaseModel):
     system_meta: NumerologySystemMeta
     inputs: NumerologyInputs
     primitives: Dict[str, PrimitiveModel]
+    signals: List[NumerologySignal] = Field(default_factory=list)
+    claims: List[NumerologyClaim] = Field(default_factory=list)
+

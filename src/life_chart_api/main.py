@@ -4,6 +4,8 @@ from pydantic import BaseModel
 
 from life_chart_api.numerology.adapter import build_numerology_response_v1
 from life_chart_api.numerology.schemas import NumerologyResponseV1
+from life_chart_api.routes.profile_compute import router as profile_compute_router
+from life_chart_api.routes.profile_stub import router as profile_router
 
 app = FastAPI(title="Life Chart API")
 app.add_middleware(
@@ -13,6 +15,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(profile_router)
+app.include_router(profile_compute_router)
 
 
 class NumerologyRequest(BaseModel):
