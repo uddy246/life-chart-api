@@ -5,8 +5,8 @@ from datetime import datetime, timezone
 from fastapi import APIRouter
 from pydantic import BaseModel, ConfigDict
 
+from life_chart_api.astrology.western.compute import compute_western_features
 from life_chart_api.astrology.western.mapper import map_western_to_core
-from life_chart_api.astrology.western.types import WesternChartFeatures
 from life_chart_api.astrology.vedic.mapper import map_vedic_to_core
 from life_chart_api.astrology.vedic.types import VedicChartFeatures
 from life_chart_api.narrative.generator import build_narrative
@@ -41,17 +41,12 @@ class ProfileComputeRequest(BaseModel):
 def compute_profile(payload: ProfileComputeRequest) -> UnifiedProfileResponse:
     now = datetime.now(timezone.utc)
 
-    west_features = WesternChartFeatures(
-        sun_sign="Pisces",
-        moon_sign="Capricorn",
-        ascendant_sign="Gemini",
-        dominant_element=None,
-        dominant_modality=None,
-        mercury_style="Pragmatic",
-        mars_style="Hesitant-then-committed",
-        venus_style="Independence-preserving",
-        saturn_theme="Responsibility through structure",
-        notes=[],
+    west_features = compute_western_features(
+        date=payload.date,
+        time=payload.time,
+        tz=payload.tz,
+        lat=payload.lat,
+        lon=payload.lon,
     )
 
     core_west = map_western_to_core(west_features)
