@@ -2,22 +2,64 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter
+import requests
+from fastapi import APIRouter, HTTPException
+from requests import RequestException
 from pydantic import BaseModel, ConfigDict, model_validator
 
 from life_chart_api.schemas.profile_response_builder import build_profile_response
 
 router = APIRouter(prefix="/profile", tags=["profile"])
+_GEOCODE_CACHE: dict[str, tuple[float, float]] = {}
+_GEOCODE_USER_AGENT = "life-chart-api/1.0 (contact: support@example.com)"
+
+
+def _cache_key(city: str, region: str | None, country: str) -> str:
+    return "|".join([city.strip().lower(), (region or "").strip().lower(), country.strip().lower()])
+
+
+def geocode_location(city: str, region: str | None, country: str) -> tuple[float, float]:
+    cache_key = _cache_key(city, region, country)
+    cached = _GEOCODE_CACHE.get(cache_key)
+    if cached:
+        return cached
+
+    query_parts = [city]
+    if region:
+        query_parts.append(region)
+    if country:
+        query_parts.append(country)
+    query = ", ".join(part for part in query_parts if part)
+
+    try:
+        response = requests.get(
+            "https://nominatim.openstreetmap.org/search",
+            params={"q": query, "format": "json", "limit": 1},
+            headers={"User-Agent": _GEOCODE_USER_AGENT},
+            timeout=10,
+        )
+        response.raise_for_status()
+        data = response.json()
+    except RequestException as exc:
+        raise HTTPException(status_code=502, detail=f"Geocoding request failed: {exc}") from exc
+
+    if not data:
+        raise HTTPException(status_code=422, detail=f"Location not found for '{query}'")
+
+    lat = float(data[0]["lat"])
+    lon = float(data[0]["lon"])
+    _GEOCODE_CACHE[cache_key] = (lat, lon)
+    return lat, lon
 
 
 class BirthLocation(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     city: str
-    region: str
+    region: str | None = None
     country: str
-    lat: float
-    lon: float
+    lat: float | None = None
+    lon: float | None = None
 
 
 class BirthInput(BaseModel):
@@ -51,12 +93,10 @@ class ProfileComputeRequest(BaseModel):
             and self.date
             and self.time
             and self.place_name
-            and self.lat is not None
-            and self.lon is not None
             and self.tz
         ):
             return self
-        raise ValueError("payload must include name/birth or full_name/date/time/place_name/lat/lon/tz")
+        raise ValueError("payload must include name/birth or full_name/date/time/place_name/tz")
 
 
 @router.post("/compute")
@@ -64,8 +104,19 @@ def compute_profile(payload: ProfileComputeRequest) -> dict[str, Any]:
     if payload.name and payload.birth:
         name = payload.name
         birth = payload.birth.model_dump()
+        location = birth["location"]
+        if not location.get("region"):
+            location["region"] = ""
+        if location.get("lat") is None or location.get("lon") is None:
+            lat, lon = geocode_location(location["city"], location.get("region"), location["country"])
+            location["lat"] = lat
+            location["lon"] = lon
     else:
         name = payload.full_name or "Unknown"
+        if payload.lat is None or payload.lon is None:
+            lat, lon = geocode_location(payload.place_name or "", None, "")
+        else:
+            lat, lon = payload.lat, payload.lon
         birth = {
             "date": payload.date,
             "time": payload.time,
@@ -74,8 +125,8 @@ def compute_profile(payload: ProfileComputeRequest) -> dict[str, Any]:
                 "city": payload.place_name,
                 "region": "",
                 "country": "",
-                "lat": payload.lat,
-                "lon": payload.lon,
+                "lat": lat,
+                "lon": lon,
             },
         }
 
