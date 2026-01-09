@@ -1,109 +1,82 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from typing import Any
 
 from fastapi import APIRouter
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
-from life_chart_api.astrology.western.compute import compute_western_features
-from life_chart_api.astrology.western.mapper import map_western_to_core
-from life_chart_api.astrology.vedic.mapper import map_vedic_to_core
-from life_chart_api.astrology.vedic.types import VedicChartFeatures
-from life_chart_api.narrative.generator import build_narrative
-from life_chart_api.schemas.core_types import (
-    BirthData,
-    BirthPlace,
-    DisclaimerBlock,
-    Quality,
-    QualityCompleteness,
-    Subject,
-    SystemUsed,
-)
-from life_chart_api.schemas.profile_response import UnifiedProfileResponse
-from life_chart_api.synthesis.engine import synthesize
+from life_chart_api.schemas.profile_response_builder import build_profile_response
 
 router = APIRouter(prefix="/profile", tags=["profile"])
+
+
+class BirthLocation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    city: str
+    region: str
+    country: str
+    lat: float
+    lon: float
+
+
+class BirthInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    date: str
+    time: str
+    timezone: str
+    location: BirthLocation
 
 
 class ProfileComputeRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    full_name: str
-    date: str
-    time: str
-    place_name: str
-    lat: float
-    lon: float
-    tz: str
+    name: str | None = None
+    birth: BirthInput | None = None
+    full_name: str | None = None
+    date: str | None = None
+    time: str | None = None
+    place_name: str | None = None
+    lat: float | None = None
+    lon: float | None = None
+    tz: str | None = None
+
+    @model_validator(mode="after")
+    def _validate_shape(self) -> "ProfileComputeRequest":
+        if self.name and self.birth:
+            return self
+        if (
+            self.full_name
+            and self.date
+            and self.time
+            and self.place_name
+            and self.lat is not None
+            and self.lon is not None
+            and self.tz
+        ):
+            return self
+        raise ValueError("payload must include name/birth or full_name/date/time/place_name/lat/lon/tz")
 
 
-@router.post("/compute", response_model=UnifiedProfileResponse)
-def compute_profile(payload: ProfileComputeRequest) -> UnifiedProfileResponse:
-    now = datetime.now(timezone.utc)
+@router.post("/compute")
+def compute_profile(payload: ProfileComputeRequest) -> dict[str, Any]:
+    if payload.name and payload.birth:
+        name = payload.name
+        birth = payload.birth.model_dump()
+    else:
+        name = payload.full_name or "Unknown"
+        birth = {
+            "date": payload.date,
+            "time": payload.time,
+            "timezone": payload.tz,
+            "location": {
+                "city": payload.place_name,
+                "region": "",
+                "country": "",
+                "lat": payload.lat,
+                "lon": payload.lon,
+            },
+        }
 
-    west_features = compute_western_features(
-        date=payload.date,
-        time=payload.time,
-        tz=payload.tz,
-        lat=payload.lat,
-        lon=payload.lon,
-    )
-
-    core_west = map_western_to_core(west_features)
-    vedic_features = VedicChartFeatures(
-        lagna_sign="Capricorn",
-        lagna_lord="Saturn",
-        moon_sign="Taurus",
-        moon_afflicted=False,
-        saturn_theme="Responsibility through structure",
-        rahu_ketu_emphasis=False,
-        life_direction_hint="Gradual ascent through responsibility",
-        timing_sensitivity_hint="high",
-        current_phase_hint="Disciplined consolidation phase",
-        notes=[],
-    )
-    core_vedic = map_vedic_to_core(vedic_features)
-
-    core_by_system = {"western": core_west, "vedic": core_vedic}
-    synth = synthesize(core_by_system)
-    narr = build_narrative(core_by_system, synth)
-
-    return UnifiedProfileResponse(
-        generated_at_utc=now,
-        subject=Subject(
-            full_name=payload.full_name,
-            birth=BirthData(
-                date=payload.date,
-                time=payload.time,
-                place=BirthPlace(
-                    name=payload.place_name,
-                    lat=payload.lat,
-                    lon=payload.lon,
-                    tz=payload.tz,
-                ),
-            ),
-        ),
-        disclaimer_blocks=[
-            DisclaimerBlock(
-                id="how_to_read",
-                title="How to read this profile",
-                body="Placeholder disclaimer body.",
-            )
-        ],
-        systems_used=[
-            SystemUsed(system="western", version="mapping_v1", enabled=True),
-            SystemUsed(system="vedic", version="mapping_v1", enabled=True),
-        ],
-        core_outputs_by_system=core_by_system,
-        synthesis=synth,
-        narrative=narr,
-        quality=Quality(
-            completeness=QualityCompleteness(
-                western=1.0,
-                vedic=1.0,
-                synthesis=1.0,
-                narrative=1.0,
-            ),
-            warnings=[],
-        ),
-    )
+    return build_profile_response(name=name, birth=birth, numerology=None)
