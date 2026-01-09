@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "schemaVersion": "1.0.0",
+    "generatedAt": "2026-01-09T00:00:00Z",
+    "engine": { "name": "life-chart-api", "version": "0.1.0" },
+    "locale": "en-GB"
+  },
+  "input": {
+    "name": "Example Person",
+    "birth": {
+      "date": "1999-02-26",
+      "time": "14:00:00",
+      "timezone": "UTC",
+      "location": { "city": "Hyderabad", "region": "Telangana", "country": "India", "lat": 17.385, "lon": 78.4867 }
+    }
+  },
+  "chart": {
+    "system": "western",
+    "zodiac": "tropical",
+    "houseSystem": "placidus",
+    "notes": "Example fixture for schema validation."
+  },
+  "identity": {
+    "sunSign": { "sign": "pisces", "degree": 7.0 },
+    "moonSign": { "sign": "taurus", "degree": 12.0 },
+    "ascendant": { "sign": "gemini", "degree": 10.0 },
+    "midheaven": { "sign": "aquarius", "degree": 2.0 },
+    "coreSummary": "Example-only summary text."
+  },
+  "planets": [
+    { "planet": "sun", "longitude": 337.0, "sign": "pisces", "degree": 7.0, "house": 10, "retrograde": false, "dignity": { "status": "neutral", "note": "" }, "notes": "" },
+    { "planet": "moon", "longitude": 42.0, "sign": "taurus", "degree": 12.0, "house": 12, "retrograde": false, "dignity": { "status": "exaltation", "note": "" }, "notes": "" },
+    { "planet": "mercury", "longitude": 320.0, "sign": "aquarius", "degree": 20.0, "house": 9, "retrograde": false, "dignity": { "status": "neutral", "note": "" }, "notes": "" },
+    { "planet": "venus", "longitude": 305.0, "sign": "aquarius", "degree": 5.0, "house": 9, "retrograde": false, "dignity": { "status": "neutral", "note": "" }, "notes": "" },
+    { "planet": "mars", "longitude": 165.0, "sign": "virgo", "degree": 15.0, "house": 4, "retrograde": false, "dignity": { "status": "neutral", "note": "" }, "notes": "" },
+    { "planet": "jupiter", "longitude": 350.0, "sign": "pisces", "degree": 20.0, "house": 10, "retrograde": false, "dignity": { "status": "domicile", "note": "" }, "notes": "" },
+    { "planet": "saturn", "longitude": 55.0, "sign": "taurus", "degree": 25.0, "house": 12, "retrograde": false, "dignity": { "status": "neutral", "note": "" }, "notes": "" },
+    { "planet": "uranus", "longitude": 315.0, "sign": "aquarius", "degree": 15.0, "house": 9, "retrograde": false, "dignity": { "status": "neutral", "note": "" }, "notes": "" },
+    { "planet": "neptune", "longitude": 301.0, "sign": "aquarius", "degree": 1.0, "house": 9, "retrograde": false, "dignity": { "status": "neutral", "note": "" }, "notes": "" },
+    { "planet": "pluto", "longitude": 245.0, "sign": "sagittarius", "degree": 5.0, "house": 7, "retrograde": false, "dignity": { "status": "neutral", "note": "" }, "notes": "" },
+    { "planet": "northNode", "longitude": 120.0, "sign": "leo", "degree": 0.0, "house": 3, "retrograde": true, "dignity": { "status": "unknown", "note": "" }, "notes": "" },
+    { "planet": "southNode", "longitude": 300.0, "sign": "aquarius", "degree": 0.0, "house": 9, "retrograde": true, "dignity": { "status": "unknown", "note": "" }, "notes": "" }
+  ],
+  "houses": [
+    { "number": 1, "sign": "gemini", "planets": [], "themes": ["self"], "notes": "" },
+    { "number": 2, "sign": "cancer", "planets": [], "themes": ["money"], "notes": "" },
+    { "number": 3, "sign": "leo", "planets": ["northNode"], "themes": ["communication"], "notes": "" },
+    { "number": 4, "sign": "virgo", "planets": ["mars"], "themes": ["home"], "notes": "" },
+    { "number": 5, "sign": "libra", "planets": [], "themes": ["creativity"], "notes": "" },
+    { "number": 6, "sign": "scorpio", "planets": [], "themes": ["work"], "notes": "" },
+    { "number": 7, "sign": "sagittarius", "planets": ["pluto"], "themes": ["partnership"], "notes": "" },
+    { "number": 8, "sign": "capricorn", "planets": [], "themes": ["change"], "notes": "" },
+    { "number": 9, "sign": "aquarius", "planets": ["mercury", "venus", "uranus", "neptune", "southNode"], "themes": ["purpose"], "notes": "" },
+    { "number": 10, "sign": "pisces", "planets": ["sun", "jupiter"], "themes": ["career"], "notes": "" },
+    { "number": 11, "sign": "aries", "planets": [], "themes": ["networks"], "notes": "" },
+    { "number": 12, "sign": "taurus", "planets": ["moon", "saturn"], "themes": ["closure"], "notes": "" }
+  ],
+  "aspects": [
+    { "from": "sun", "to": "jupiter", "type": "conjunction", "orbDegrees": 3.0, "strength": 0.8, "note": "" }
+  ],
+  "strengths": {
+    "planetary": [],
+    "chartBalance": {
+      "elements": { "low": [], "medium": [], "high": [], "notes": "" },
+      "modalities": { "low": [], "medium": [], "high": [], "notes": "" },
+      "hemispheres": { "north": 50, "south": 50, "east": 50, "west": 50, "notes": "" }
+    },
+    "dominantThemes": ["Example theme"]
+  },
+  "transits": {
+    "referenceDate": "2026-01-09",
+    "signals": [
+      {
+        "window": { "start": "2026-01-01T00:00:00Z", "end": "2026-03-01T00:00:00Z" },
+        "signal": "Example timing signal",
+        "confidence": 0.5,
+        "drivers": ["Example transit driver"],
+        "note": ""
+      }
+    ]
+  },
+  "predictions": {
+    "lifeAreas": [
+      { "area": "career", "outlook": "mixed", "timingNotes": "Example", "actionableAdvice": "Example" }
+    ]
+  },
+  "relationships": {
+    "style": { "bonding": "Example", "conflict": "Example", "repair": "Example" },
+    "indicators": [],
+    "riskFlags": [],
+    "notes": "Example relationship notes."
+  },
+  "career": {
+    "vectors": [
+      { "label": "Example vector", "why": "Example rationale", "supportingPlanets": ["sun"], "supportingHouses": [10], "notes": "" }
+    ],
+    "bestEnvironments": ["structured"],
+    "successFormula": ["Example step 1", "Example step 2"],
+    "nearTermAdvice": "Example advice."
+  },
+  "integratedSummary": { "convergences": [], "divergences": [], "bridgeTags": ["western"] },
+  "narrative": {
+    "headline": "Example headline",
+    "sections": [
+      { "key": "identity", "title": "Identity", "body": "Example", "bullets": [] },
+      { "key": "mind", "title": "Mind", "body": "Example", "bullets": [] },
+      { "key": "career", "title": "Career", "body": "Example", "bullets": [] },
+      { "key": "relationships", "title": "Relationships", "body": "Example", "bullets": [] },
+      { "key": "timing", "title": "Timing", "body": "Example", "bullets": [] },
+      { "key": "summary", "title": "Summary", "body": "Example", "bullets": [] }
+    ],
+    "disclaimers": ["Example disclaimer."]
+  }
+}

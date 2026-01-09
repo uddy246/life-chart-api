@@ -1,18 +1,18 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-
-  "title": "ChineseAstrologyProfile",
+  "title": "WesternAstrologyProfile",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "meta",
     "input",
-    "system",
-    "pillars",
-    "dayMaster",
-    "tenGods",
-    "elements",
-    "luckCycles",
+    "chart",
+    "identity",
+    "planets",
+    "houses",
+    "aspects",
+    "strengths",
+    "transits",
     "predictions",
     "relationships",
     "career",
@@ -36,7 +36,7 @@
             "version": { "type": "string" }
           }
         },
-        "locale": { "type": "string" }
+        "locale": { "type": "string", "description": "BCP-47 locale, e.g. en-GB" }
       }
     },
 
@@ -54,9 +54,10 @@
             "date": { "type": "string", "format": "date" },
             "time": {
               "type": "string",
-              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$",
+              "description": "24h time; seconds optional"
             },
-            "timezone": { "type": "string" },
+            "timezone": { "type": "string", "description": "IANA tz, e.g. Europe/London" },
             "location": {
               "type": "object",
               "additionalProperties": false,
@@ -74,104 +75,104 @@
       }
     },
 
-    "system": {
+    "chart": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["system", "calendar", "notes"],
+      "required": ["system", "zodiac", "houseSystem", "notes"],
       "properties": {
-        "system": { "type": "string", "enum": ["chinese"] },
-        "calendar": { "type": "string", "enum": ["solar"], "description": "BaZi pillars are typically solar (jieqi-based)." },
-        "notes": { "type": "string" }
-      }
-    },
-
-    "pillars": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["year", "month", "day", "hour"],
-      "properties": {
-        "year": { "$ref": "#/$defs/pillar" },
-        "month": { "$ref": "#/$defs/pillar" },
-        "day": { "$ref": "#/$defs/pillar" },
-        "hour": { "$ref": "#/$defs/pillar" }
-      }
-    },
-
-    "dayMaster": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["stem", "element", "yinYang", "strength", "notes"],
-      "properties": {
-        "stem": { "$ref": "#/$defs/heavenlyStem" },
-        "element": { "$ref": "#/$defs/element" },
-        "yinYang": { "$ref": "#/$defs/yinYang" },
-        "strength": { "type": "string", "enum": ["weak", "balanced", "strong"] },
-        "notes": { "type": "string" }
-      }
-    },
-
-    "tenGods": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["profile", "dominant", "notes"],
-      "properties": {
-        "profile": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/tenGodItem" },
-          "minItems": 1
-        },
-        "dominant": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/tenGod" },
-          "minItems": 1
+        "system": { "type": "string", "enum": ["western"] },
+        "zodiac": { "type": "string", "enum": ["tropical"] },
+        "houseSystem": {
+          "type": "string",
+          "enum": ["placidus", "wholeSign", "equal", "koch"],
+          "description": "Match your engine; placidus is common."
         },
         "notes": { "type": "string" }
       }
     },
 
-    "elements": {
+    "identity": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["distribution", "favourable", "unfavourable", "balanceAdvice"],
+      "required": ["sunSign", "moonSign", "ascendant", "coreSummary"],
       "properties": {
-        "distribution": { "$ref": "#/$defs/elementDistribution" },
-        "favourable": { "type": "array", "items": { "$ref": "#/$defs/element" }, "minItems": 1 },
-        "unfavourable": { "type": "array", "items": { "$ref": "#/$defs/element" } },
-        "balanceAdvice": { "type": "string" }
+        "sunSign": { "$ref": "#/$defs/signPlacement" },
+        "moonSign": { "$ref": "#/$defs/signPlacement" },
+        "ascendant": { "$ref": "#/$defs/signPlacement" },
+        "midheaven": { "$ref": "#/$defs/signPlacement" },
+        "coreSummary": { "type": "string" }
       }
     },
 
-    "luckCycles": {
+    "planets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/planetPlacement" },
+      "minItems": 10,
+      "description": "At minimum Sun..Pluto; nodes optional but recommended."
+    },
+
+    "houses": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/house" },
+      "minItems": 12,
+      "maxItems": 12
+    },
+
+    "aspects": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/aspect" },
+      "description": "Inter-planetary aspects; may be filtered to major aspects."
+    },
+
+    "strengths": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["startAge", "direction", "pillars", "current"],
+      "required": ["planetary", "chartBalance", "dominantThemes"],
       "properties": {
-        "startAge": { "type": "number", "minimum": 0, "maximum": 12 },
-        "direction": { "type": "string", "enum": ["forward", "backward"] },
-        "pillars": {
+        "planetary": {
           "type": "array",
-          "items": { "$ref": "#/$defs/luckPillar" },
-          "minItems": 1
+          "items": { "$ref": "#/$defs/planetStrength" }
         },
-        "current": {
+        "chartBalance": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["pillarIndex", "theme", "advice"],
+          "required": ["elements", "modalities", "hemispheres"],
           "properties": {
-            "pillarIndex": { "type": "integer", "minimum": 0 },
-            "theme": { "type": "string" },
-            "advice": { "type": "string" }
+            "elements": { "$ref": "#/$defs/balanceBuckets" },
+            "modalities": { "$ref": "#/$defs/balanceBuckets" },
+            "hemispheres": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["north", "south", "east", "west", "notes"],
+              "properties": {
+                "north": { "type": "number", "minimum": 0, "maximum": 100 },
+                "south": { "type": "number", "minimum": 0, "maximum": 100 },
+                "east": { "type": "number", "minimum": 0, "maximum": 100 },
+                "west": { "type": "number", "minimum": 0, "maximum": 100 },
+                "notes": { "type": "string" }
+              }
+            }
           }
-        }
+        },
+        "dominantThemes": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      }
+    },
+
+    "transits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["referenceDate", "signals"],
+      "properties": {
+        "referenceDate": { "type": "string", "format": "date" },
+        "signals": { "type": "array", "items": { "$ref": "#/$defs/timingSignal" } }
       }
     },
 
     "predictions": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["timingSignals", "lifeAreas"],
+      "required": ["lifeAreas"],
       "properties": {
-        "timingSignals": { "type": "array", "items": { "$ref": "#/$defs/timingSignal" } },
         "lifeAreas": { "type": "array", "items": { "$ref": "#/$defs/lifeAreaForecast" } }
       }
     },
@@ -181,7 +182,16 @@
       "additionalProperties": false,
       "required": ["style", "indicators", "riskFlags", "notes"],
       "properties": {
-        "style": { "type": "string" },
+        "style": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bonding", "conflict", "repair"],
+          "properties": {
+            "bonding": { "type": "string" },
+            "conflict": { "type": "string" },
+            "repair": { "type": "string" }
+          }
+        },
         "indicators": { "type": "array", "items": { "$ref": "#/$defs/indicator" } },
         "riskFlags": { "type": "array", "items": { "$ref": "#/$defs/riskFlag" } },
         "notes": { "type": "string" }
@@ -227,102 +237,138 @@
   },
 
   "$defs": {
-    "yinYang": { "type": "string", "enum": ["yin", "yang"] },
-
-    "element": { "type": "string", "enum": ["wood", "fire", "earth", "metal", "water"] },
-
-    "heavenlyStem": {
-      "type": "string",
-      "enum": ["jia", "yi", "bing", "ding", "wu", "ji", "geng", "xin", "ren", "gui"]
-    },
-
-    "earthlyBranch": {
-      "type": "string",
-      "enum": ["zi", "chou", "yin", "mao", "chen", "si", "wu", "wei", "shen", "you", "xu", "hai"]
-    },
-
-    "tenGod": {
+    "planet": {
       "type": "string",
       "enum": [
-        "friend",
-        "robWealth",
-        "eatingGod",
-        "hurtingOfficer",
-        "directWealth",
-        "indirectWealth",
-        "directOfficer",
-        "sevenKillings",
-        "directResource",
-        "indirectResource"
+        "sun",
+        "moon",
+        "mercury",
+        "venus",
+        "mars",
+        "jupiter",
+        "saturn",
+        "uranus",
+        "neptune",
+        "pluto",
+        "northNode",
+        "southNode",
+        "chiron"
       ]
     },
 
-    "hiddenStem": {
+    "sign": {
+      "type": "string",
+      "enum": [
+        "aries",
+        "taurus",
+        "gemini",
+        "cancer",
+        "leo",
+        "virgo",
+        "libra",
+        "scorpio",
+        "sagittarius",
+        "capricorn",
+        "aquarius",
+        "pisces"
+      ]
+    },
+
+    "houseNumber": { "type": "integer", "minimum": 1, "maximum": 12 },
+
+    "degreeInSign": { "type": "number", "minimum": 0, "exclusiveMaximum": 30 },
+
+    "longitude": { "type": "number", "minimum": 0, "exclusiveMaximum": 360 },
+
+    "signPlacement": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["stem", "element", "yinYang", "weight"],
+      "required": ["sign", "degree"],
       "properties": {
-        "stem": { "$ref": "#/$defs/heavenlyStem" },
-        "element": { "$ref": "#/$defs/element" },
-        "yinYang": { "$ref": "#/$defs/yinYang" },
-        "weight": { "type": "number", "minimum": 0, "maximum": 1 }
+        "sign": { "$ref": "#/$defs/sign" },
+        "degree": { "$ref": "#/$defs/degreeInSign" }
       }
     },
 
-    "pillar": {
+    "planetPlacement": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["stem", "branch", "stemElement", "stemYinYang", "branchAnimal", "hiddenStems", "notes"],
+      "required": ["planet", "longitude", "sign", "degree", "house", "retrograde", "dignity", "notes"],
       "properties": {
-        "stem": { "$ref": "#/$defs/heavenlyStem" },
-        "branch": { "$ref": "#/$defs/earthlyBranch" },
-        "stemElement": { "$ref": "#/$defs/element" },
-        "stemYinYang": { "$ref": "#/$defs/yinYang" },
-        "branchAnimal": {
-          "type": "string",
-          "enum": ["rat", "ox", "tiger", "rabbit", "dragon", "snake", "horse", "goat", "monkey", "rooster", "dog", "pig"]
+        "planet": { "$ref": "#/$defs/planet" },
+        "longitude": { "$ref": "#/$defs/longitude" },
+        "sign": { "$ref": "#/$defs/sign" },
+        "degree": { "$ref": "#/$defs/degreeInSign" },
+        "house": { "$ref": "#/$defs/houseNumber" },
+        "retrograde": { "type": "boolean" },
+        "dignity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "note"],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["domicile", "detriment", "exaltation", "fall", "neutral", "unknown"]
+            },
+            "note": { "type": "string" }
+          }
         },
-        "hiddenStems": { "type": "array", "items": { "$ref": "#/$defs/hiddenStem" } },
         "notes": { "type": "string" }
       }
     },
 
-    "tenGodItem": {
+    "house": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["key", "weight", "domains", "notes"],
+      "required": ["number", "sign", "planets", "themes", "notes"],
       "properties": {
-        "key": { "$ref": "#/$defs/tenGod" },
-        "weight": { "type": "number", "minimum": 0, "maximum": 1 },
-        "domains": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-        "notes": { "type": "string" }
-      }
-    },
-
-    "elementDistribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["wood", "fire", "earth", "metal", "water", "notes"],
-      "properties": {
-        "wood": { "type": "number", "minimum": 0, "maximum": 100 },
-        "fire": { "type": "number", "minimum": 0, "maximum": 100 },
-        "earth": { "type": "number", "minimum": 0, "maximum": 100 },
-        "metal": { "type": "number", "minimum": 0, "maximum": 100 },
-        "water": { "type": "number", "minimum": 0, "maximum": 100 },
-        "notes": { "type": "string" }
-      }
-    },
-
-    "luckPillar": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["index", "startAge", "endAge", "pillar", "themes", "notes"],
-      "properties": {
-        "index": { "type": "integer", "minimum": 0 },
-        "startAge": { "type": "number", "minimum": 0 },
-        "endAge": { "type": "number", "minimum": 0 },
-        "pillar": { "$ref": "#/$defs/pillar" },
+        "number": { "$ref": "#/$defs/houseNumber" },
+        "sign": { "$ref": "#/$defs/sign" },
+        "planets": { "type": "array", "items": { "$ref": "#/$defs/planet" } },
         "themes": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "aspectType": {
+      "type": "string",
+      "enum": ["conjunction", "sextile", "square", "trine", "opposition", "quincunx"]
+    },
+
+    "aspect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "type", "orbDegrees", "strength", "note"],
+      "properties": {
+        "from": { "$ref": "#/$defs/planet" },
+        "to": { "$ref": "#/$defs/planet" },
+        "type": { "$ref": "#/$defs/aspectType" },
+        "orbDegrees": { "type": "number", "minimum": 0, "maximum": 12 },
+        "strength": { "type": "number", "minimum": 0, "maximum": 1 },
+        "note": { "type": "string" }
+      }
+    },
+
+    "planetStrength": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["planet", "overallScore", "band", "drivers"],
+      "properties": {
+        "planet": { "$ref": "#/$defs/planet" },
+        "overallScore": { "type": "number", "minimum": 0, "maximum": 100 },
+        "band": { "type": "string", "enum": ["low", "medium", "high"] },
+        "drivers": { "type": "array", "items": { "$ref": "#/$defs/scoredFactor" }, "minItems": 1 }
+      }
+    },
+
+    "balanceBuckets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["low", "medium", "high", "notes"],
+      "properties": {
+        "low": { "type": "array", "items": { "type": "string" } },
+        "medium": { "type": "array", "items": { "type": "string" } },
+        "high": { "type": "array", "items": { "type": "string" } },
         "notes": { "type": "string" }
       }
     },
@@ -390,12 +436,12 @@
     "careerVector": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["label", "why", "supportingTenGods", "supportingElements", "notes"],
+      "required": ["label", "why", "supportingPlanets", "supportingHouses", "notes"],
       "properties": {
         "label": { "type": "string" },
         "why": { "type": "string" },
-        "supportingTenGods": { "type": "array", "items": { "$ref": "#/$defs/tenGod" } },
-        "supportingElements": { "type": "array", "items": { "$ref": "#/$defs/element" } },
+        "supportingPlanets": { "type": "array", "items": { "$ref": "#/$defs/planet" } },
+        "supportingHouses": { "type": "array", "items": { "$ref": "#/$defs/houseNumber" } },
         "notes": { "type": "string" }
       }
     },
@@ -407,7 +453,7 @@
       "properties": {
         "systems": {
           "type": "array",
-          "items": { "type": "string", "enum": ["chinese", "vedic", "western", "numerology"] },
+          "items": { "type": "string", "enum": ["western", "vedic", "chinese", "numerology"] },
           "minItems": 2
         },
         "signal": { "type": "string" },
@@ -423,7 +469,7 @@
       "properties": {
         "systems": {
           "type": "array",
-          "items": { "type": "string", "enum": ["chinese", "vedic", "western", "numerology"] },
+          "items": { "type": "string", "enum": ["western", "vedic", "chinese", "numerology"] },
           "minItems": 2
         },
         "signal": { "type": "string" },
@@ -440,6 +486,17 @@
         "title": { "type": "string" },
         "body": { "type": "string" },
         "bullets": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "scoredFactor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "score", "note"],
+      "properties": {
+        "key": { "type": "string" },
+        "score": { "type": "number", "minimum": -1, "maximum": 1 },
+        "note": { "type": "string" }
       }
     }
   }

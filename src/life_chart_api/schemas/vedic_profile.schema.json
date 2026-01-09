@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Vedic Profile Features",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "lagna_sign",
+    "lagna_lord",
+    "moon_sign",
+    "moon_afflicted",
+    "saturn_theme",
+    "rahu_ketu_emphasis",
+    "life_direction_hint",
+    "timing_sensitivity_hint",
+    "current_phase_hint",
+    "notes"
+  ],
+  "properties": {
+    "lagna_sign": {
+      "type": "string",
+      "enum": [
+        "Aries",
+        "Taurus",
+        "Gemini",
+        "Cancer",
+        "Leo",
+        "Virgo",
+        "Libra",
+        "Scorpio",
+        "Sagittarius",
+        "Capricorn",
+        "Aquarius",
+        "Pisces"
+      ]
+    },
+    "lagna_lord": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "moon_sign": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "Aries",
+            "Taurus",
+            "Gemini",
+            "Cancer",
+            "Leo",
+            "Virgo",
+            "Libra",
+            "Scorpio",
+            "Sagittarius",
+            "Capricorn",
+            "Aquarius",
+            "Pisces"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "moon_afflicted": {
+      "type": "boolean"
+    },
+    "saturn_theme": {
+      "type": ["string", "null"]
+    },
+    "rahu_ketu_emphasis": {
+      "type": "boolean"
+    },
+    "life_direction_hint": {
+      "type": ["string", "null"]
+    },
+    "timing_sensitivity_hint": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "current_phase_hint": {
+      "type": ["string", "null"]
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
