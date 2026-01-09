@@ -3,7 +3,9 @@ from __future__ import annotations
 from typing import Any
 
 from life_chart_api.astrology.western.compute import compute_western_features
+from life_chart_api.astrology.vedic.compute import compute_vedic_features
 from life_chart_api.schemas.example_loader import load_example_json, stamp_meta_and_input
+from life_chart_api.synthesis.overlay_vedic import overlay_vedic_tier1
 from life_chart_api.synthesis.overlay_western import overlay_western_tier1
 from life_chart_api.synthesis.intersection_engine import build_intersection
 
@@ -25,6 +27,19 @@ def build_profile_response(
             lon=location.get("lon", 0.0),
         )
         western = overlay_western_tier1(western, computed)
+    except Exception:
+        pass
+
+    try:
+        location = birth.get("location", {})
+        computed = compute_vedic_features(
+            date=birth.get("date", ""),
+            time=birth.get("time", ""),
+            tz=birth.get("timezone", ""),
+            lat=location.get("lat", 0.0),
+            lon=location.get("lon", 0.0),
+        )
+        vedic = overlay_vedic_tier1(vedic, computed)
     except Exception:
         pass
 
