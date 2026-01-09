@@ -30,10 +30,40 @@ class NarrativeRequest(BaseModel):
     tone: str = "neutral"
 
 
+def _apply_query_overrides(
+    payload: NarrativeRequest,
+    request: Request | None,
+) -> tuple[NarrativeRequest, str | None, str | None]:
+    if not request:
+        return payload, None, None
+
+    params = request.query_params
+    updates: dict[str, str] = {}
+    if "include" in params:
+        updates["include"] = params.get("include", "")
+    if "granularity" in params:
+        updates["granularity"] = params.get("granularity", "")
+    if "tone" in params:
+        updates["tone"] = params.get("tone", "")
+
+    if updates:
+        payload = payload.model_copy(update=updates)
+
+    return payload, params.get("from"), params.get("to")
+
+
 @router.get("/narrative")
 def get_narrative(payload: NarrativeRequest = Depends(), request: Request = None) -> dict:
     raw_from = request.query_params.get("from") if request else None
     raw_to = request.query_params.get("to") if request else None
+    forecast = build_forecast_from_payload(payload, raw_from=raw_from, raw_to=raw_to)
+    tone = parse_tone(payload.tone, path="query.tone")
+    return build_narrative_response(forecast, tone=tone)
+
+
+@router.post("/narrative")
+def post_narrative(payload: NarrativeRequest, request: Request = None) -> dict:
+    payload, raw_from, raw_to = _apply_query_overrides(payload, request)
     forecast = build_forecast_from_payload(payload, raw_from=raw_from, raw_to=raw_to)
     tone = parse_tone(payload.tone, path="query.tone")
     return build_narrative_response(forecast, tone=tone)
