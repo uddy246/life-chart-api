@@ -32,7 +32,7 @@ from life_chart_api.versioning import (
 app = FastAPI(title="Life Chart API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://essence-unifier.lovable.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
