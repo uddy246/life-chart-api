@@ -5,6 +5,7 @@ from typing import Any
 from life_chart_api.astrology.western.compute import compute_western_features
 from life_chart_api.astrology.vedic.compute import compute_vedic_features
 from life_chart_api.schemas.example_loader import load_example_json, stamp_meta_and_input
+from life_chart_api.synthesis.overlay_chinese import compute_chinese_tier1, overlay_chinese_tier1
 from life_chart_api.synthesis.overlay_vedic import overlay_vedic_tier1
 from life_chart_api.synthesis.overlay_western import overlay_western_tier1
 from life_chart_api.synthesis.intersection_engine import build_intersection
@@ -40,6 +41,16 @@ def build_profile_response(
             lon=location.get("lon", 0.0),
         )
         vedic = overlay_vedic_tier1(vedic, computed)
+    except Exception:
+        pass
+
+    try:
+        computed = compute_chinese_tier1(
+            date_str=birth.get("date", ""),
+            time_str=birth.get("time", ""),
+            tz=birth.get("timezone", ""),
+        )
+        chinese = overlay_chinese_tier1(chinese, computed)
     except Exception:
         pass
 
