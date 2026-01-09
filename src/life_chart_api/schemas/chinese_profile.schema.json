@@ -1,0 +1,446 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/chinese-astrology-profile.schema.json",
+  "title": "ChineseAstrologyProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "meta",
+    "input",
+    "system",
+    "pillars",
+    "dayMaster",
+    "tenGods",
+    "elements",
+    "luckCycles",
+    "predictions",
+    "relationships",
+    "career",
+    "integratedSummary",
+    "narrative"
+  ],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "generatedAt", "engine", "locale"],
+      "properties": {
+        "schemaVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "engine": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version"],
+          "properties": {
+            "name": { "type": "string" },
+            "version": { "type": "string" }
+          }
+        },
+        "locale": { "type": "string" }
+      }
+    },
+
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "birth"],
+      "properties": {
+        "name": { "type": "string" },
+        "birth": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["date", "time", "timezone", "location"],
+          "properties": {
+            "date": { "type": "string", "format": "date" },
+            "time": {
+              "type": "string",
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
+            },
+            "timezone": { "type": "string" },
+            "location": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["city", "region", "country", "lat", "lon"],
+              "properties": {
+                "city": { "type": "string" },
+                "region": { "type": "string" },
+                "country": { "type": "string" },
+                "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+                "lon": { "type": "number", "minimum": -180, "maximum": 180 }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "calendar", "notes"],
+      "properties": {
+        "system": { "type": "string", "enum": ["chinese"] },
+        "calendar": { "type": "string", "enum": ["solar"], "description": "BaZi pillars are typically solar (jieqi-based)." },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "pillars": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["year", "month", "day", "hour"],
+      "properties": {
+        "year": { "$ref": "#/$defs/pillar" },
+        "month": { "$ref": "#/$defs/pillar" },
+        "day": { "$ref": "#/$defs/pillar" },
+        "hour": { "$ref": "#/$defs/pillar" }
+      }
+    },
+
+    "dayMaster": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stem", "element", "yinYang", "strength", "notes"],
+      "properties": {
+        "stem": { "$ref": "#/$defs/heavenlyStem" },
+        "element": { "$ref": "#/$defs/element" },
+        "yinYang": { "$ref": "#/$defs/yinYang" },
+        "strength": { "type": "string", "enum": ["weak", "balanced", "strong"] },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "tenGods": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "dominant", "notes"],
+      "properties": {
+        "profile": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/tenGodItem" },
+          "minItems": 1
+        },
+        "dominant": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/tenGod" },
+          "minItems": 1
+        },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "elements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["distribution", "favourable", "unfavourable", "balanceAdvice"],
+      "properties": {
+        "distribution": { "$ref": "#/$defs/elementDistribution" },
+        "favourable": { "type": "array", "items": { "$ref": "#/$defs/element" }, "minItems": 1 },
+        "unfavourable": { "type": "array", "items": { "$ref": "#/$defs/element" } },
+        "balanceAdvice": { "type": "string" }
+      }
+    },
+
+    "luckCycles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["startAge", "direction", "pillars", "current"],
+      "properties": {
+        "startAge": { "type": "number", "minimum": 0, "maximum": 12 },
+        "direction": { "type": "string", "enum": ["forward", "backward"] },
+        "pillars": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/luckPillar" },
+          "minItems": 1
+        },
+        "current": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pillarIndex", "theme", "advice"],
+          "properties": {
+            "pillarIndex": { "type": "integer", "minimum": 0 },
+            "theme": { "type": "string" },
+            "advice": { "type": "string" }
+          }
+        }
+      }
+    },
+
+    "predictions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timingSignals", "lifeAreas"],
+      "properties": {
+        "timingSignals": { "type": "array", "items": { "$ref": "#/$defs/timingSignal" } },
+        "lifeAreas": { "type": "array", "items": { "$ref": "#/$defs/lifeAreaForecast" } }
+      }
+    },
+
+    "relationships": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["style", "indicators", "riskFlags", "notes"],
+      "properties": {
+        "style": { "type": "string" },
+        "indicators": { "type": "array", "items": { "$ref": "#/$defs/indicator" } },
+        "riskFlags": { "type": "array", "items": { "$ref": "#/$defs/riskFlag" } },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "career": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vectors", "bestEnvironments", "successFormula", "nearTermAdvice"],
+      "properties": {
+        "vectors": { "type": "array", "items": { "$ref": "#/$defs/careerVector" }, "minItems": 1 },
+        "bestEnvironments": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["structured", "fluid", "competitive", "collaborative", "independent"] }
+        },
+        "successFormula": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+        "nearTermAdvice": { "type": "string" }
+      }
+    },
+
+    "integratedSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["convergences", "divergences", "bridgeTags"],
+      "properties": {
+        "convergences": { "type": "array", "items": { "$ref": "#/$defs/convergence" } },
+        "divergences": { "type": "array", "items": { "$ref": "#/$defs/divergence" } },
+        "bridgeTags": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "narrative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["headline", "sections", "disclaimers"],
+      "properties": {
+        "headline": { "type": "string" },
+        "sections": { "type": "array", "items": { "$ref": "#/$defs/narrativeSection" }, "minItems": 6 },
+        "disclaimers": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      }
+    }
+  },
+
+  "$defs": {
+    "yinYang": { "type": "string", "enum": ["yin", "yang"] },
+
+    "element": { "type": "string", "enum": ["wood", "fire", "earth", "metal", "water"] },
+
+    "heavenlyStem": {
+      "type": "string",
+      "enum": ["jia", "yi", "bing", "ding", "wu", "ji", "geng", "xin", "ren", "gui"]
+    },
+
+    "earthlyBranch": {
+      "type": "string",
+      "enum": ["zi", "chou", "yin", "mao", "chen", "si", "wu", "wei", "shen", "you", "xu", "hai"]
+    },
+
+    "tenGod": {
+      "type": "string",
+      "enum": [
+        "friend",
+        "robWealth",
+        "eatingGod",
+        "hurtingOfficer",
+        "directWealth",
+        "indirectWealth",
+        "directOfficer",
+        "sevenKillings",
+        "directResource",
+        "indirectResource"
+      ]
+    },
+
+    "hiddenStem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stem", "element", "yinYang", "weight"],
+      "properties": {
+        "stem": { "$ref": "#/$defs/heavenlyStem" },
+        "element": { "$ref": "#/$defs/element" },
+        "yinYang": { "$ref": "#/$defs/yinYang" },
+        "weight": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+
+    "pillar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stem", "branch", "stemElement", "stemYinYang", "branchAnimal", "hiddenStems", "notes"],
+      "properties": {
+        "stem": { "$ref": "#/$defs/heavenlyStem" },
+        "branch": { "$ref": "#/$defs/earthlyBranch" },
+        "stemElement": { "$ref": "#/$defs/element" },
+        "stemYinYang": { "$ref": "#/$defs/yinYang" },
+        "branchAnimal": {
+          "type": "string",
+          "enum": ["rat", "ox", "tiger", "rabbit", "dragon", "snake", "horse", "goat", "monkey", "rooster", "dog", "pig"]
+        },
+        "hiddenStems": { "type": "array", "items": { "$ref": "#/$defs/hiddenStem" } },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "tenGodItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "weight", "domains", "notes"],
+      "properties": {
+        "key": { "$ref": "#/$defs/tenGod" },
+        "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+        "domains": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "elementDistribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wood", "fire", "earth", "metal", "water", "notes"],
+      "properties": {
+        "wood": { "type": "number", "minimum": 0, "maximum": 100 },
+        "fire": { "type": "number", "minimum": 0, "maximum": 100 },
+        "earth": { "type": "number", "minimum": 0, "maximum": 100 },
+        "metal": { "type": "number", "minimum": 0, "maximum": 100 },
+        "water": { "type": "number", "minimum": 0, "maximum": 100 },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "luckPillar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index", "startAge", "endAge", "pillar", "themes", "notes"],
+      "properties": {
+        "index": { "type": "integer", "minimum": 0 },
+        "startAge": { "type": "number", "minimum": 0 },
+        "endAge": { "type": "number", "minimum": 0 },
+        "pillar": { "$ref": "#/$defs/pillar" },
+        "themes": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "timingSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["window", "signal", "confidence", "drivers", "note"],
+      "properties": {
+        "window": { "$ref": "#/$defs/timeWindow" },
+        "signal": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "drivers": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "note": { "type": "string" }
+      }
+    },
+
+    "timeWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "string", "format": "date-time" },
+        "end": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "lifeAreaForecast": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["area", "outlook", "timingNotes", "actionableAdvice"],
+      "properties": {
+        "area": {
+          "type": "string",
+          "enum": ["self", "career", "money", "relationships", "family", "healthEnergy", "learning", "travel", "spirituality"]
+        },
+        "outlook": { "type": "string", "enum": ["supportive", "mixed", "testing"] },
+        "timingNotes": { "type": "string" },
+        "actionableAdvice": { "type": "string" }
+      }
+    },
+
+    "indicator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "strength", "note"],
+      "properties": {
+        "key": { "type": "string" },
+        "strength": { "type": "string", "enum": ["low", "medium", "high"] },
+        "note": { "type": "string" }
+      }
+    },
+
+    "riskFlag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "severity", "note"],
+      "properties": {
+        "key": { "type": "string" },
+        "severity": { "type": "string", "enum": ["low", "medium", "high"] },
+        "note": { "type": "string" }
+      }
+    },
+
+    "careerVector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "why", "supportingTenGods", "supportingElements", "notes"],
+      "properties": {
+        "label": { "type": "string" },
+        "why": { "type": "string" },
+        "supportingTenGods": { "type": "array", "items": { "$ref": "#/$defs/tenGod" } },
+        "supportingElements": { "type": "array", "items": { "$ref": "#/$defs/element" } },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "convergence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["systems", "signal", "confidence", "note"],
+      "properties": {
+        "systems": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["chinese", "vedic", "western", "numerology"] },
+          "minItems": 2
+        },
+        "signal": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "note": { "type": "string" }
+      }
+    },
+
+    "divergence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["systems", "signal", "note"],
+      "properties": {
+        "systems": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["chinese", "vedic", "western", "numerology"] },
+          "minItems": 2
+        },
+        "signal": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    },
+
+    "narrativeSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "title", "body", "bullets"],
+      "properties": {
+        "key": { "type": "string" },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "bullets": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

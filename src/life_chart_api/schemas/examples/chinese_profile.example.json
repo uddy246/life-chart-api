@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "schemaVersion": "1.0.0",
+    "generatedAt": "2026-01-09T00:00:00Z",
+    "engine": { "name": "life-chart-api", "version": "0.1.0" },
+    "locale": "en-GB"
+  },
+  "input": {
+    "name": "Example Person",
+    "birth": {
+      "date": "1999-02-26",
+      "time": "14:00:00",
+      "timezone": "UTC",
+      "location": { "city": "Hyderabad", "region": "Telangana", "country": "India", "lat": 17.385, "lon": 78.4867 }
+    }
+  },
+  "system": { "system": "chinese", "calendar": "solar", "notes": "Example fixture for schema validation." },
+  "pillars": {
+    "year": {
+      "stem": "ji",
+      "branch": "mao",
+      "stemElement": "earth",
+      "stemYinYang": "yin",
+      "branchAnimal": "rabbit",
+      "hiddenStems": [
+        { "stem": "yi", "element": "wood", "yinYang": "yin", "weight": 0.6 }
+      ],
+      "notes": ""
+    },
+    "month": {
+      "stem": "bing",
+      "branch": "yin",
+      "stemElement": "fire",
+      "stemYinYang": "yang",
+      "branchAnimal": "tiger",
+      "hiddenStems": [
+        { "stem": "jia", "element": "wood", "yinYang": "yang", "weight": 0.5 },
+        { "stem": "bing", "element": "fire", "yinYang": "yang", "weight": 0.3 }
+      ],
+      "notes": ""
+    },
+    "day": {
+      "stem": "ren",
+      "branch": "chen",
+      "stemElement": "water",
+      "stemYinYang": "yang",
+      "branchAnimal": "dragon",
+      "hiddenStems": [
+        { "stem": "wu", "element": "earth", "yinYang": "yang", "weight": 0.5 },
+        { "stem": "gui", "element": "water", "yinYang": "yin", "weight": 0.3 }
+      ],
+      "notes": ""
+    },
+    "hour": {
+      "stem": "geng",
+      "branch": "wei",
+      "stemElement": "metal",
+      "stemYinYang": "yang",
+      "branchAnimal": "goat",
+      "hiddenStems": [
+        { "stem": "ji", "element": "earth", "yinYang": "yin", "weight": 0.5 }
+      ],
+      "notes": ""
+    }
+  },
+  "dayMaster": {
+    "stem": "ren",
+    "element": "water",
+    "yinYang": "yang",
+    "strength": "balanced",
+    "notes": "Example-only Day Master interpretation."
+  },
+  "tenGods": {
+    "profile": [
+      { "key": "directResource", "weight": 0.6, "domains": ["learning", "support"], "notes": "" },
+      { "key": "directOfficer", "weight": 0.4, "domains": ["structure", "responsibility"], "notes": "" }
+    ],
+    "dominant": ["directResource"],
+    "notes": "Example-only Ten Gods summary."
+  },
+  "elements": {
+    "distribution": { "wood": 20, "fire": 20, "earth": 20, "metal": 20, "water": 20, "notes": "" },
+    "favourable": ["metal", "water"],
+    "unfavourable": ["fire"],
+    "balanceAdvice": "Example advice."
+  },
+  "luckCycles": {
+    "startAge": 7,
+    "direction": "forward",
+    "pillars": [
+      {
+        "index": 0,
+        "startAge": 7,
+        "endAge": 17,
+        "pillar": {
+          "stem": "xin",
+          "branch": "mao",
+          "stemElement": "metal",
+          "stemYinYang": "yin",
+          "branchAnimal": "rabbit",
+          "hiddenStems": [{ "stem": "yi", "element": "wood", "yinYang": "yin", "weight": 0.6 }],
+          "notes": ""
+        },
+        "themes": ["Example luck theme"],
+        "notes": ""
+      }
+    ],
+    "current": { "pillarIndex": 0, "theme": "Example current theme", "advice": "Example advice" }
+  },
+  "predictions": {
+    "timingSignals": [
+      {
+        "window": { "start": "2026-01-01T00:00:00Z", "end": "2026-12-31T00:00:00Z" },
+        "signal": "Example timing signal",
+        "confidence": 0.5,
+        "drivers": ["Example driver"],
+        "note": ""
+      }
+    ],
+    "lifeAreas": [
+      { "area": "career", "outlook": "mixed", "timingNotes": "Example", "actionableAdvice": "Example" }
+    ]
+  },
+  "relationships": { "style": "Example relationship style.", "indicators": [], "riskFlags": [], "notes": "Example notes." },
+  "career": {
+    "vectors": [
+      {
+        "label": "Example vector",
+        "why": "Example rationale",
+        "supportingTenGods": ["directOfficer"],
+        "supportingElements": ["metal"],
+        "notes": ""
+      }
+    ],
+    "bestEnvironments": ["structured"],
+    "successFormula": ["Example step 1", "Example step 2"],
+    "nearTermAdvice": "Example advice."
+  },
+  "integratedSummary": { "convergences": [], "divergences": [], "bridgeTags": ["chinese"] },
+  "narrative": {
+    "headline": "Example headline",
+    "sections": [
+      { "key": "identity", "title": "Identity", "body": "Example", "bullets": [] },
+      { "key": "elements", "title": "Elements", "body": "Example", "bullets": [] },
+      { "key": "career", "title": "Career", "body": "Example", "bullets": [] },
+      { "key": "relationships", "title": "Relationships", "body": "Example", "bullets": [] },
+      { "key": "timing", "title": "Timing", "body": "Example", "bullets": [] },
+      { "key": "summary", "title": "Summary", "body": "Example", "bullets": [] }
+    ],
+    "disclaimers": ["Example disclaimer."]
+  }
+}
