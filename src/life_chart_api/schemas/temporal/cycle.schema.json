@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TemporalCycle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "cycleId",
+    "system",
+    "kind",
+    "domain",
+    "themes",
+    "start",
+    "end",
+    "intensity",
+    "polarity",
+    "evidence"
+  ],
+  "properties": {
+    "cycleId": { "type": "string" },
+    "system": {
+      "type": "string",
+      "enum": ["western", "vedic", "chinese", "numerology", "intersection"]
+    },
+    "kind": { "type": "string" },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "personality",
+        "mind",
+        "relationships",
+        "career",
+        "energy",
+        "growth",
+        "health",
+        "money"
+      ]
+    },
+    "themes": { "type": "array", "items": { "type": "string" } },
+    "start": { "type": "string", "pattern": "^\\d{4}-\\d{2}(-\\d{2})?$" },
+    "end": { "type": "string", "pattern": "^\\d{4}-\\d{2}(-\\d{2})?$" },
+    "intensity": { "type": "number", "minimum": 0, "maximum": 1 },
+    "polarity": {
+      "type": "string",
+      "enum": ["supporting", "challenging", "neutral"]
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "peak": { "type": "string", "pattern": "^\\d{4}-\\d{2}(-\\d{2})?$" },
+    "ageStart": { "type": "number" },
+    "ageEnd": { "type": "number" },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "value", "weight", "note"],
+      "properties": {
+        "source": { "type": "string" },
+        "value": { "type": ["string", "number", "boolean", "array", "object", "null"] },
+        "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}

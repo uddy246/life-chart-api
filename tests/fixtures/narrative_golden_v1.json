@@ -1,0 +1,311 @@
+{
+  "byDomain": {
+    "career": {
+      "bullets": [
+        "No high-confidence windows in this domain.",
+        "Monitor for emerging signals."
+      ],
+      "headline": "No strong career windows in this range.",
+      "topWindows": []
+    },
+    "growth": {
+      "bullets": [
+        "2026-01-01 to 2026-01-31: supporting focus on day master strength.",
+        "2026-02-01 to 2026-02-28: supporting focus on day master strength."
+      ],
+      "headline": "Key growth themes in this range",
+      "topWindows": [
+        "cycle-d8caf09c5ed4",
+        "cycle-52298f5223fe",
+        "cycle-2f54cdee61cb"
+      ]
+    },
+    "relationships": {
+      "bullets": [
+        "No high-confidence windows in this domain.",
+        "Monitor for emerging signals."
+      ],
+      "headline": "No strong relationships windows in this range.",
+      "topWindows": []
+    }
+  },
+  "input": {
+    "birth": {
+      "date": "1999-02-26",
+      "location": {
+        "city": "Hyderabad",
+        "country": "India",
+        "lat": 17.385,
+        "lon": 78.4867,
+        "region": "Telangana"
+      },
+      "time": "14:00:00",
+      "timezone": "UTC"
+    },
+    "name": "Example Person"
+  },
+  "meta": {
+    "granularity": "month",
+    "range": {
+      "from": "2026-01",
+      "to": "2027-12"
+    },
+    "version": "phase3.2"
+  },
+  "overview": {
+    "bullets": [
+      "Top window 2026-01-01 to 2026-01-31 (supporting, intensity 0.45, confidence 0.57) themes: day_master_strength, element_earth, pillar_cycle.",
+      "Most common theme across top windows: day_master_strength.",
+      "Polarity balance: 6 supporting, 0 challenging, 0 neutral."
+    ],
+    "citations": [
+      {
+        "evidenceCycleIds": [
+          "cycle-2f1e6e67e9f7",
+          "cycle-5847217bcbaa",
+          "cycle-9ae5aecf9f17"
+        ],
+        "systemsAligned": [
+          "chinese",
+          "vedic"
+        ],
+        "themes": [
+          "window:2026-01",
+          "day_master_strength",
+          "element_earth",
+          "pillar_cycle"
+        ],
+        "windowId": "cycle-d8caf09c5ed4"
+      },
+      {
+        "evidenceCycleIds": [
+          "cycle-2f1e6e67e9f7",
+          "cycle-9ae5aecf9f17"
+        ],
+        "systemsAligned": [
+          "chinese",
+          "vedic"
+        ],
+        "themes": [
+          "window:2026-02",
+          "day_master_strength",
+          "element_earth",
+          "pillar_cycle"
+        ],
+        "windowId": "cycle-52298f5223fe"
+      }
+    ],
+    "headline": "Next period highlights day master strength with supporting emphasis."
+  },
+  "style": {
+    "readingLevel": "plain",
+    "tone": "neutral"
+  },
+  "windows": [
+    {
+      "citations": [
+        {
+          "evidenceCycleIds": [
+            "cycle-2f1e6e67e9f7",
+            "cycle-5847217bcbaa",
+            "cycle-9ae5aecf9f17"
+          ],
+          "systemsAligned": [
+            "chinese",
+            "vedic"
+          ],
+          "themes": [
+            "window:2026-01",
+            "day_master_strength",
+            "element_earth",
+            "pillar_cycle"
+          ],
+          "windowId": "cycle-d8caf09c5ed4"
+        }
+      ],
+      "end": "2026-01-31",
+      "paragraphs": [
+        "From 2026-01-01 to 2026-01-31, this is a supporting period with intensity 0.45 and confidence 0.57.",
+        "Primary focus: day master strength and element earth.",
+        "Signals align across 2 systems (chinese and vedic)."
+      ],
+      "start": "2026-01-01",
+      "takeaways": [
+        "Lean into day master strength actions; aim for steady execution.",
+        "Prioritize decisions that compound over weeks, not days."
+      ],
+      "title": "Supportive window for day master strength",
+      "windowId": "cycle-d8caf09c5ed4"
+    },
+    {
+      "citations": [
+        {
+          "evidenceCycleIds": [
+            "cycle-2f1e6e67e9f7",
+            "cycle-9ae5aecf9f17"
+          ],
+          "systemsAligned": [
+            "chinese",
+            "vedic"
+          ],
+          "themes": [
+            "window:2026-02",
+            "day_master_strength",
+            "element_earth",
+            "pillar_cycle"
+          ],
+          "windowId": "cycle-52298f5223fe"
+        }
+      ],
+      "end": "2026-02-28",
+      "paragraphs": [
+        "From 2026-02-01 to 2026-02-28, this is a supporting period with intensity 0.28 and confidence 0.49.",
+        "Primary focus: day master strength and element earth.",
+        "Signals align across 2 systems (chinese and vedic)."
+      ],
+      "start": "2026-02-01",
+      "takeaways": [
+        "Lean into day master strength actions; aim for steady execution.",
+        "Prioritize decisions that compound over weeks, not days."
+      ],
+      "title": "Supportive window for day master strength",
+      "windowId": "cycle-52298f5223fe"
+    },
+    {
+      "citations": [
+        {
+          "evidenceCycleIds": [
+            "cycle-2f1e6e67e9f7",
+            "cycle-9ae5aecf9f17"
+          ],
+          "systemsAligned": [
+            "chinese",
+            "vedic"
+          ],
+          "themes": [
+            "window:2026-03",
+            "day_master_strength",
+            "element_earth",
+            "pillar_cycle"
+          ],
+          "windowId": "cycle-2f54cdee61cb"
+        }
+      ],
+      "end": "2026-03-31",
+      "paragraphs": [
+        "From 2026-03-01 to 2026-03-31, this is a supporting period with intensity 0.28 and confidence 0.49.",
+        "Primary focus: day master strength and element earth.",
+        "Signals align across 2 systems (chinese and vedic)."
+      ],
+      "start": "2026-03-01",
+      "takeaways": [
+        "Lean into day master strength actions; aim for steady execution.",
+        "Prioritize decisions that compound over weeks, not days."
+      ],
+      "title": "Supportive window for day master strength",
+      "windowId": "cycle-2f54cdee61cb"
+    },
+    {
+      "citations": [
+        {
+          "evidenceCycleIds": [
+            "cycle-2f1e6e67e9f7",
+            "cycle-9ae5aecf9f17"
+          ],
+          "systemsAligned": [
+            "chinese",
+            "vedic"
+          ],
+          "themes": [
+            "window:2026-04",
+            "day_master_strength",
+            "element_earth",
+            "pillar_cycle"
+          ],
+          "windowId": "cycle-6b3c80d05bfa"
+        }
+      ],
+      "end": "2026-04-30",
+      "paragraphs": [
+        "From 2026-04-01 to 2026-04-30, this is a supporting period with intensity 0.28 and confidence 0.49.",
+        "Primary focus: day master strength and element earth.",
+        "Signals align across 2 systems (chinese and vedic)."
+      ],
+      "start": "2026-04-01",
+      "takeaways": [
+        "Lean into day master strength actions; aim for steady execution.",
+        "Prioritize decisions that compound over weeks, not days."
+      ],
+      "title": "Supportive window for day master strength",
+      "windowId": "cycle-6b3c80d05bfa"
+    },
+    {
+      "citations": [
+        {
+          "evidenceCycleIds": [
+            "cycle-2f1e6e67e9f7",
+            "cycle-9ae5aecf9f17"
+          ],
+          "systemsAligned": [
+            "chinese",
+            "vedic"
+          ],
+          "themes": [
+            "window:2026-05",
+            "day_master_strength",
+            "element_earth",
+            "pillar_cycle"
+          ],
+          "windowId": "cycle-c18da2fe9061"
+        }
+      ],
+      "end": "2026-05-31",
+      "paragraphs": [
+        "From 2026-05-01 to 2026-05-31, this is a supporting period with intensity 0.28 and confidence 0.49.",
+        "Primary focus: day master strength and element earth.",
+        "Signals align across 2 systems (chinese and vedic)."
+      ],
+      "start": "2026-05-01",
+      "takeaways": [
+        "Lean into day master strength actions; aim for steady execution.",
+        "Prioritize decisions that compound over weeks, not days."
+      ],
+      "title": "Supportive window for day master strength",
+      "windowId": "cycle-c18da2fe9061"
+    },
+    {
+      "citations": [
+        {
+          "evidenceCycleIds": [
+            "cycle-2f1e6e67e9f7",
+            "cycle-9ae5aecf9f17"
+          ],
+          "systemsAligned": [
+            "chinese",
+            "vedic"
+          ],
+          "themes": [
+            "window:2026-06",
+            "day_master_strength",
+            "element_earth",
+            "pillar_cycle"
+          ],
+          "windowId": "cycle-8e73ab415718"
+        }
+      ],
+      "end": "2026-06-30",
+      "paragraphs": [
+        "From 2026-06-01 to 2026-06-30, this is a supporting period with intensity 0.28 and confidence 0.49.",
+        "Primary focus: day master strength and element earth.",
+        "Signals align across 2 systems (chinese and vedic)."
+      ],
+      "start": "2026-06-01",
+      "takeaways": [
+        "Lean into day master strength actions; aim for steady execution.",
+        "Prioritize decisions that compound over weeks, not days."
+      ],
+      "title": "Supportive window for day master strength",
+      "windowId": "cycle-8e73ab415718"
+    }
+  ]
+}

@@ -55,3 +55,18 @@ def overlay_vedic_tier1(vedic_template: dict[str, Any], computed: Any) -> dict[s
         vedic_template["lagna_lord"] = lagna_lord
 
     return vedic_template
+
+
+def overlay_vedic_tier2(vedic_template: dict[str, Any], computed: Any) -> dict[str, Any]:
+    moon_afflicted = _get_computed_value(computed, "moon_afflicted")
+    rahu_ketu_emphasis = _get_computed_value(computed, "rahu_ketu_emphasis")
+    saturn_theme = _get_computed_value(computed, "saturn_theme")
+
+    if isinstance(moon_afflicted, bool):
+        vedic_template["moon_afflicted"] = moon_afflicted
+    if isinstance(rahu_ketu_emphasis, bool):
+        vedic_template["rahu_ketu_emphasis"] = rahu_ketu_emphasis
+    if isinstance(saturn_theme, str) and saturn_theme:
+        vedic_template["saturn_theme"] = saturn_theme
+
+    return vedic_template

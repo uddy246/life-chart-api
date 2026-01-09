@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NumerologyProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["system_meta", "inputs", "primitives", "signals", "claims"],
+  "properties": {
+    "system_meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "variant", "version", "policies"],
+      "properties": {
+        "system": { "type": "string", "enum": ["numerology"] },
+        "variant": { "type": "string" },
+        "version": { "type": "string" },
+        "policies": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "vowels",
+            "life_path_method",
+            "masters",
+            "karmic_debts",
+            "keep_masters_personal_year"
+          ],
+          "properties": {
+            "vowels": { "type": "string" },
+            "life_path_method": { "type": "string" },
+            "masters": { "type": "array", "items": { "type": "integer" } },
+            "karmic_debts": { "type": "array", "items": { "type": "integer" } },
+            "keep_masters_personal_year": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dob", "full_name_birth_raw", "full_name_birth_normalized"],
+      "properties": {
+        "dob": { "type": "string", "format": "date" },
+        "full_name_birth_raw": { "type": "string" },
+        "full_name_birth_normalized": { "type": "string" },
+        "as_of_date": { "type": ["string", "null"], "format": "date" },
+        "forecast_year": { "type": ["integer", "null"] }
+      }
+    },
+    "primitives": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "life_path",
+        "expression",
+        "soul_urge",
+        "personality",
+        "birthday",
+        "attitude",
+        "maturity",
+        "personal_year"
+      ],
+      "properties": {
+        "life_path": { "$ref": "#/$defs/primitive" },
+        "expression": { "$ref": "#/$defs/primitive" },
+        "soul_urge": { "$ref": "#/$defs/primitive" },
+        "personality": { "$ref": "#/$defs/primitive" },
+        "birthday": { "$ref": "#/$defs/primitive" },
+        "attitude": { "$ref": "#/$defs/primitive" },
+        "maturity": { "$ref": "#/$defs/primitive" },
+        "personal_year": { "$ref": "#/$defs/primitive" }
+      }
+    },
+    "signals": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/signal" }
+    },
+    "claims": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/claim" }
+    }
+  },
+  "$defs": {
+    "reduction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start_value", "steps", "final_value", "is_master"],
+      "properties": {
+        "start_value": { "type": "integer" },
+        "steps": { "type": "array", "items": { "type": "integer" } },
+        "final_value": { "type": "integer" },
+        "is_master": { "type": "boolean" },
+        "base_value": { "type": ["integer", "null"] }
+      }
+    },
+    "flags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["is_master", "has_karmic_debt"],
+      "properties": {
+        "is_master": { "type": "boolean" },
+        "has_karmic_debt": { "type": "boolean" }
+      }
+    },
+    "primitive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "raw", "reduction", "flags"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "enum": [
+            "life_path",
+            "expression",
+            "soul_urge",
+            "personality",
+            "birthday",
+            "attitude",
+            "maturity",
+            "personal_year"
+          ]
+        },
+        "raw": { "type": "object", "additionalProperties": true },
+        "reduction": { "$ref": "#/$defs/reduction" },
+        "flags": { "$ref": "#/$defs/flags" }
+      }
+    },
+    "signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signal_id",
+        "source_key",
+        "number",
+        "primary_layer",
+        "functions",
+        "healthy_expression",
+        "stress_expression",
+        "growth_tension"
+      ],
+      "properties": {
+        "signal_id": { "type": "string" },
+        "source_key": { "type": "string" },
+        "number": { "type": "integer" },
+        "base_number": { "type": ["integer", "null"] },
+        "primary_layer": { "type": "integer" },
+        "functions": { "type": "array", "items": { "type": "string" } },
+        "healthy_expression": { "type": "array", "items": { "type": "string" } },
+        "stress_expression": { "type": "array", "items": { "type": "string" } },
+        "growth_tension": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["layer", "layer_label", "text", "evidence"],
+      "properties": {
+        "layer": { "type": "integer" },
+        "layer_label": { "type": "string" },
+        "text": { "type": "string" },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence" }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_key", "number"],
+      "properties": {
+        "source_key": { "type": "string" },
+        "number": { "type": "integer" }
+      }
+    }
+  }
+}

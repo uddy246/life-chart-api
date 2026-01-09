@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "NarrativeResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "input", "overview", "windows", "byDomain", "style"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "granularity", "range"],
+      "properties": {
+        "version": { "type": "string" },
+        "granularity": { "type": "string", "enum": ["month", "quarter"] },
+        "range": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["from", "to"],
+          "properties": {
+            "from": { "type": "string", "pattern": "^\\d{4}-\\d{2}$" },
+            "to": { "type": "string", "pattern": "^\\d{4}-\\d{2}$" }
+          }
+        },
+        "as_of": { "type": "string", "format": "date" }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["birth"],
+      "properties": {
+        "name": { "type": "string" },
+        "birth": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["date", "time", "timezone", "location"],
+          "properties": {
+            "date": { "type": "string", "format": "date" },
+            "time": {
+              "type": "string",
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
+            },
+            "timezone": { "type": "string" },
+            "location": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["city", "region", "country", "lat", "lon"],
+              "properties": {
+                "city": { "type": "string" },
+                "region": { "type": "string" },
+                "country": { "type": "string" },
+                "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+                "lon": { "type": "number", "minimum": -180, "maximum": 180 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "overview": { "$ref": "#/$defs/overview" },
+    "windows": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/windowNarrative" }
+    },
+    "byDomain": { "$ref": "#/$defs/byDomain" },
+    "style": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tone", "readingLevel"],
+      "properties": {
+        "tone": { "type": "string", "enum": ["neutral", "direct", "reflective"] },
+        "readingLevel": { "type": "string", "enum": ["plain"] }
+      }
+    }
+  },
+  "$defs": {
+    "citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["windowId", "themes", "systemsAligned", "evidenceCycleIds"],
+      "properties": {
+        "windowId": { "type": "string" },
+        "themes": { "type": "array", "items": { "type": "string" } },
+        "systemsAligned": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["western", "vedic", "chinese", "numerology"] }
+        },
+        "evidenceCycleIds": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "overview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["headline", "bullets", "citations"],
+      "properties": {
+        "headline": { "type": "string" },
+        "bullets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 3,
+          "maxItems": 6
+        },
+        "citations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/citation" }
+        }
+      }
+    },
+    "windowNarrative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["windowId", "start", "end", "title", "paragraphs", "takeaways", "citations"],
+      "properties": {
+        "windowId": { "type": "string" },
+        "start": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "end": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "title": { "type": "string" },
+        "paragraphs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "maxItems": 3
+        },
+        "takeaways": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 2,
+          "maxItems": 4
+        },
+        "citations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/citation" }
+        }
+      }
+    },
+    "domainSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["headline", "bullets", "topWindows"],
+      "properties": {
+        "headline": { "type": "string" },
+        "bullets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 2,
+          "maxItems": 4
+        },
+        "topWindows": { "type": "array", "items": { "type": "string" }, "maxItems": 3 }
+      }
+    },
+    "byDomain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["career", "relationships", "growth"],
+      "properties": {
+        "career": { "$ref": "#/$defs/domainSummary" },
+        "relationships": { "$ref": "#/$defs/domainSummary" },
+        "growth": { "$ref": "#/$defs/domainSummary" }
+      }
+    }
+  }
+}

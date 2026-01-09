@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ErrorResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["error"],
+  "properties": {
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_INPUT",
+            "VALIDATION_FAILED",
+            "RATE_LIMITED",
+            "INTERNAL_ERROR",
+            "NOT_FOUND"
+          ]
+        },
+        "message": { "type": "string" },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "issue"],
+            "properties": {
+              "path": { "type": "string" },
+              "issue": { "type": "string" }
+            }
+          }
+        },
+        "requestId": { "type": "string" }
+      }
+    }
+  }
+}

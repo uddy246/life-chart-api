@@ -399,7 +399,7 @@ INTERPRETATION_TABLE: Dict[int, Dict[int, Dict[str, List[str]]]] = {
 
 
 def _layer_for_key(key: str) -> int:
-    return PRIMITIVE_LAYER.get(key, 2)
+    return PRIMITIVE_LAYER.get(key, 3)
 
 
 def _get_table_entry(number: int, layer: int) -> Dict[str, List[str]]:

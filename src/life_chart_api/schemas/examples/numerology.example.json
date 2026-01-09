@@ -1,0 +1,512 @@
+{
+  "system_meta": {
+    "system": "numerology",
+    "variant": "pythagorean",
+    "version": "1.0",
+    "policies": {
+      "vowels": "AEIOUY_ALWAYS",
+      "life_path_method": "YYYYMMDD_DIGIT_SUM",
+      "masters": [
+        11,
+        22,
+        33
+      ],
+      "karmic_debts": [
+        13,
+        14,
+        16,
+        19
+      ],
+      "keep_masters_personal_year": false
+    }
+  },
+  "inputs": {
+    "dob": "1999-02-26",
+    "full_name_birth_raw": "Example Person",
+    "full_name_birth_normalized": "EXAMPLEPERSON",
+    "as_of_date": null,
+    "forecast_year": null
+  },
+  "primitives": {
+    "life_path": {
+      "key": "life_path",
+      "raw": {
+        "dob": "1999-02-26",
+        "digits_yyyymmdd": [
+          1,
+          9,
+          9,
+          9,
+          0,
+          2,
+          2,
+          6
+        ],
+        "digit_sum": 38
+      },
+      "reduction": {
+        "start_value": 38,
+        "steps": [
+          38,
+          11
+        ],
+        "final_value": 11,
+        "is_master": true,
+        "base_value": 2
+      },
+      "flags": {
+        "is_master": true,
+        "has_karmic_debt": false
+      }
+    },
+    "expression": {
+      "key": "expression",
+      "raw": {
+        "full_name_birth_raw": "Example Person",
+        "full_name_birth_normalized": "EXAMPLEPERSON",
+        "name_sum": 64
+      },
+      "reduction": {
+        "start_value": 64,
+        "steps": [
+          64,
+          10,
+          1
+        ],
+        "final_value": 1,
+        "is_master": false,
+        "base_value": null
+      },
+      "flags": {
+        "is_master": false,
+        "has_karmic_debt": false
+      }
+    },
+    "soul_urge": {
+      "key": "soul_urge",
+      "raw": {
+        "full_name_birth_raw": "Example Person",
+        "full_name_birth_normalized": "EXAMPLEPERSON",
+        "vowel_sum": 22
+      },
+      "reduction": {
+        "start_value": 22,
+        "steps": [
+          22
+        ],
+        "final_value": 22,
+        "is_master": true,
+        "base_value": 4
+      },
+      "flags": {
+        "is_master": true,
+        "has_karmic_debt": false
+      }
+    },
+    "personality": {
+      "key": "personality",
+      "raw": {
+        "full_name_birth_raw": "Example Person",
+        "full_name_birth_normalized": "EXAMPLEPERSON",
+        "consonant_sum": 42
+      },
+      "reduction": {
+        "start_value": 42,
+        "steps": [
+          42,
+          6
+        ],
+        "final_value": 6,
+        "is_master": false,
+        "base_value": null
+      },
+      "flags": {
+        "is_master": false,
+        "has_karmic_debt": false
+      }
+    },
+    "birthday": {
+      "key": "birthday",
+      "raw": {
+        "dob": "1999-02-26",
+        "day": 26
+      },
+      "reduction": {
+        "start_value": 26,
+        "steps": [
+          26,
+          8
+        ],
+        "final_value": 8,
+        "is_master": false,
+        "base_value": null
+      },
+      "flags": {
+        "is_master": false,
+        "has_karmic_debt": false
+      }
+    },
+    "attitude": {
+      "key": "attitude",
+      "raw": {
+        "dob": "1999-02-26",
+        "month": 2,
+        "day": 26,
+        "month_plus_day": 28
+      },
+      "reduction": {
+        "start_value": 28,
+        "steps": [
+          28,
+          10,
+          1
+        ],
+        "final_value": 1,
+        "is_master": false,
+        "base_value": null
+      },
+      "flags": {
+        "is_master": false,
+        "has_karmic_debt": false
+      }
+    },
+    "maturity": {
+      "key": "maturity",
+      "raw": {
+        "life_path_value": 11,
+        "expression_value": 1,
+        "sum": 12
+      },
+      "reduction": {
+        "start_value": 12,
+        "steps": [
+          12,
+          3
+        ],
+        "final_value": 3,
+        "is_master": false,
+        "base_value": null
+      },
+      "flags": {
+        "is_master": false,
+        "has_karmic_debt": false
+      }
+    },
+    "personal_year": {
+      "key": "personal_year",
+      "raw": {
+        "dob": "1999-02-26",
+        "birth_month": 2,
+        "birth_day": 26,
+        "target_year": 2026,
+        "target_year_digit_sum": 10,
+        "sum": 38,
+        "keep_masters": false
+      },
+      "reduction": {
+        "start_value": 38,
+        "steps": [
+          38,
+          11,
+          2
+        ],
+        "final_value": 2,
+        "is_master": false,
+        "base_value": null
+      },
+      "flags": {
+        "is_master": false,
+        "has_karmic_debt": false
+      }
+    }
+  },
+  "signals": [
+    {
+      "signal_id": "life_path:11:3",
+      "source_key": "life_path",
+      "number": 11,
+      "base_number": 2,
+      "primary_layer": 3,
+      "functions": [
+        "growth_lesson_theme",
+        "discipline_and_responsibility"
+      ],
+      "healthy_expression": [
+        "orients long-term choices around a guiding signal",
+        "creates meaning that organizes direction"
+      ],
+      "stress_expression": [
+        "chases the perfect path and stalls progress",
+        "over-idealizes the mission and ignores constraints"
+      ],
+      "growth_tension": [
+        {
+          "type": "master_to_base",
+          "master": 11,
+          "base": 2,
+          "message": "Intensity must be stabilised through the base expression."
+        }
+      ]
+    },
+    {
+      "signal_id": "expression:1:1",
+      "source_key": "expression",
+      "number": 1,
+      "base_number": null,
+      "primary_layer": 1,
+      "functions": [
+        "emotional_processing",
+        "relational_needs"
+      ],
+      "healthy_expression": [
+        "moves from impulse to clear desire and chooses a first step",
+        "creates self-definition by making a small, concrete start"
+      ],
+      "stress_expression": [
+        "tightens into self-protection and isolates to avoid interference",
+        "pushes for unilateral control when feedback appears"
+      ],
+      "growth_tension": [
+        {
+          "type": "practice",
+          "message": "stabilizes growth through consistent practice"
+        }
+      ]
+    },
+    {
+      "signal_id": "soul_urge:22:1",
+      "source_key": "soul_urge",
+      "number": 22,
+      "base_number": 4,
+      "primary_layer": 1,
+      "functions": [
+        "emotional_processing",
+        "relational_needs"
+      ],
+      "healthy_expression": [
+        "organizes attention into a workable process"
+      ],
+      "stress_expression": [
+        "over-controls the process and narrows options"
+      ],
+      "growth_tension": [
+        {
+          "type": "master_to_base",
+          "master": 22,
+          "base": 4,
+          "message": "Intensity must be stabilised through the base expression."
+        }
+      ]
+    },
+    {
+      "signal_id": "personality:6:1",
+      "source_key": "personality",
+      "number": 6,
+      "base_number": null,
+      "primary_layer": 1,
+      "functions": [
+        "emotional_processing",
+        "relational_needs"
+      ],
+      "healthy_expression": [
+        "organizes attention into a workable process"
+      ],
+      "stress_expression": [
+        "over-controls the process and narrows options"
+      ],
+      "growth_tension": [
+        {
+          "type": "practice",
+          "message": "stabilizes growth through consistent practice"
+        }
+      ]
+    },
+    {
+      "signal_id": "birthday:8:2",
+      "source_key": "birthday",
+      "number": 8,
+      "base_number": null,
+      "primary_layer": 2,
+      "functions": [
+        "decision_making_under_pressure",
+        "boundaries_and_assertion"
+      ],
+      "healthy_expression": [
+        "organizes attention into a workable process"
+      ],
+      "stress_expression": [
+        "over-controls the process and narrows options"
+      ],
+      "growth_tension": [
+        {
+          "type": "practice",
+          "message": "stabilizes growth through consistent practice"
+        }
+      ]
+    },
+    {
+      "signal_id": "attitude:1:2",
+      "source_key": "attitude",
+      "number": 1,
+      "base_number": null,
+      "primary_layer": 2,
+      "functions": [
+        "decision_making_under_pressure",
+        "boundaries_and_assertion"
+      ],
+      "healthy_expression": [
+        "tracks the emotional field and adapts without losing position",
+        "builds alignment by pacing decisions with others"
+      ],
+      "stress_expression": [
+        "over-weights harmony and delays necessary moves",
+        "absorbs tension and becomes reactive to others' needs"
+      ],
+      "growth_tension": [
+        {
+          "type": "practice",
+          "message": "stabilizes growth through consistent practice"
+        }
+      ]
+    },
+    {
+      "signal_id": "maturity:3:4",
+      "source_key": "maturity",
+      "number": 3,
+      "base_number": null,
+      "primary_layer": 4,
+      "functions": [
+        "integration_outcome"
+      ],
+      "healthy_expression": [
+        "builds a stable voice that others can rely on",
+        "uses storytelling to transmit hard-won lessons"
+      ],
+      "stress_expression": [
+        "avoids commitment to keep options open",
+        "treats meaning as entertainment and erodes trust"
+      ],
+      "growth_tension": [
+        {
+          "type": "practice",
+          "message": "stabilizes growth through consistent practice"
+        }
+      ]
+    },
+    {
+      "signal_id": "personal_year:2:3",
+      "source_key": "personal_year",
+      "number": 2,
+      "base_number": null,
+      "primary_layer": 3,
+      "functions": [
+        "growth_lesson_theme",
+        "discipline_and_responsibility"
+      ],
+      "healthy_expression": [
+        "connects people and resources to keep momentum stable",
+        "builds bridges that reduce friction over time"
+      ],
+      "stress_expression": [
+        "prioritizes connection at the expense of direction",
+        "spreads attention thin to avoid disappointing others"
+      ],
+      "growth_tension": [
+        {
+          "type": "practice",
+          "message": "stabilizes growth through consistent practice"
+        }
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "layer": 3,
+      "layer_label": "Structural / Life trajectory",
+      "text": "Over time life tends to orients long-term choices around a guiding signal.",
+      "evidence": [
+        {
+          "source_key": "life_path",
+          "number": 11
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "layer_label": "Emotional / Experiential",
+      "text": "When safe, moves from impulse to clear desire and chooses a first step.",
+      "evidence": [
+        {
+          "source_key": "expression",
+          "number": 1
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "layer_label": "Emotional / Experiential",
+      "text": "When safe, organizes attention into a workable process.",
+      "evidence": [
+        {
+          "source_key": "soul_urge",
+          "number": 22
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "layer_label": "Emotional / Experiential",
+      "text": "When safe, organizes attention into a workable process.",
+      "evidence": [
+        {
+          "source_key": "personality",
+          "number": 6
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "layer_label": "Behavioural / Pressure",
+      "text": "Under pressure, over-controls the process and narrows options.",
+      "evidence": [
+        {
+          "source_key": "birthday",
+          "number": 8
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "layer_label": "Behavioural / Pressure",
+      "text": "Under pressure, over-weights harmony and delays necessary moves.",
+      "evidence": [
+        {
+          "source_key": "attitude",
+          "number": 1
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "layer_label": "Integration / Maturity",
+      "text": "With maturity you stabilise into commits to a message and refines it over time.",
+      "evidence": [
+        {
+          "source_key": "maturity",
+          "number": 3
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "layer_label": "Structural / Life trajectory",
+      "text": "Over time life tends to connects people and resources to keep momentum stable.",
+      "evidence": [
+        {
+          "source_key": "personal_year",
+          "number": 2
+        }
+      ]
+    }
+  ]
+}

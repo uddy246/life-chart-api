@@ -84,6 +84,7 @@
         "convergences": { "type": "array", "items": { "$ref": "#/$defs/convergence" } },
         "divergences": { "type": "array", "items": { "$ref": "#/$defs/divergence" } },
         "bridgeTags": { "type": "array", "items": { "type": "string" } },
+        "v2": { "$ref": "#/$defs/intersectionV2" },
         "summary": {
           "type": "object",
           "additionalProperties": false,
@@ -145,6 +146,113 @@
         "signal": { "type": "string" },
         "note": { "type": "string" },
         "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidenceItem" } }
+      }
+    },
+
+    "intersectionV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["meta", "canonicalSignals", "convergences", "divergences", "bridgeTags", "summary"],
+      "properties": {
+        "meta": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["version", "weights", "signalCount"],
+          "properties": {
+            "version": { "type": "string" },
+            "weights": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["western", "vedic", "chinese", "numerology"],
+              "properties": {
+                "western": { "type": "number", "minimum": 0, "maximum": 1 },
+                "vedic": { "type": "number", "minimum": 0, "maximum": 1 },
+                "chinese": { "type": "number", "minimum": 0, "maximum": 1 },
+                "numerology": { "type": "number", "minimum": 0, "maximum": 1 }
+              }
+            },
+            "signalCount": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "canonicalSignals": { "type": "array", "items": { "$ref": "#/$defs/canonicalSignalV2" } },
+        "convergences": { "type": "array", "items": { "$ref": "#/$defs/convergenceV2" } },
+        "divergences": { "type": "array", "items": { "$ref": "#/$defs/divergenceV2" } },
+        "bridgeTags": { "type": "array", "items": { "type": "string" } },
+        "summary": { "$ref": "#/$defs/summaryV2" }
+      }
+    },
+
+    "canonicalSignalV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "domain", "polarity", "strength", "evidence"],
+      "properties": {
+        "id": { "type": "string" },
+        "domain": {
+          "type": "string",
+          "enum": ["personality", "mind", "relationships", "career", "energy", "growth"]
+        },
+        "polarity": { "type": "string", "enum": ["supporting", "challenging", "neutral"] },
+        "strength": { "type": "number", "minimum": 0, "maximum": 1 },
+        "valence": { "type": "number", "minimum": -1, "maximum": 1 },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidenceV2" } }
+      }
+    },
+
+    "evidenceV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "weight", "source", "value", "note"],
+      "properties": {
+        "system": { "$ref": "#/$defs/systemKey" },
+        "weight": { "type": "number", "minimum": 0, "maximum": 1 },
+        "source": { "type": "string" },
+        "value": { "type": ["string", "number", "boolean", "array", "object", "null"] },
+        "note": { "type": "string" }
+      }
+    },
+
+    "convergenceV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "systems", "confidence", "strength", "note", "evidence"],
+      "properties": {
+        "id": { "type": "string" },
+        "systems": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/systemKey" },
+          "minItems": 2
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "strength": { "type": "number", "minimum": 0, "maximum": 1 },
+        "note": { "type": "string" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidenceV2" } }
+      }
+    },
+
+    "divergenceV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "systems", "note", "evidence"],
+      "properties": {
+        "id": { "type": "string" },
+        "systems": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/systemKey" },
+          "minItems": 2
+        },
+        "note": { "type": "string" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidenceV2" } }
+      }
+    },
+
+    "summaryV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["headline", "notes"],
+      "properties": {
+        "headline": { "type": "string" },
+        "notes": { "type": "array", "items": { "type": "string" } }
       }
     }
   }

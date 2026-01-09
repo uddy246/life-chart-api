@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "version": "phase3.2",
+    "granularity": "month",
+    "range": { "from": "2026-01", "to": "2027-12" },
+    "as_of": "2026-06-01"
+  },
+  "input": {
+    "name": "Example Person",
+    "birth": {
+      "date": "1999-02-26",
+      "time": "14:00:00",
+      "timezone": "UTC",
+      "location": {
+        "city": "Hyderabad",
+        "region": "Telangana",
+        "country": "India",
+        "lat": 17.385,
+        "lon": 78.4867
+      }
+    }
+  },
+  "overview": {
+    "headline": "Next period highlights structure and discipline with supporting emphasis.",
+    "bullets": [
+      "Top window 2026-03-01 to 2026-03-31 (supporting, intensity 0.72, confidence 0.68) themes: structure_discipline.",
+      "Most common theme across top windows: structure_discipline.",
+      "Polarity balance: 1 supporting, 0 challenging, 0 neutral."
+    ],
+    "citations": [
+      {
+        "windowId": "cycle-abc123example",
+        "themes": ["window:2026-03", "structure_discipline"],
+        "systemsAligned": ["vedic", "western"],
+        "evidenceCycleIds": ["cycle-ved-1", "cycle-wes-2"]
+      }
+    ]
+  },
+  "windows": [
+    {
+      "windowId": "cycle-abc123example",
+      "start": "2026-03-01",
+      "end": "2026-03-31",
+      "title": "Supportive window for structure and discipline",
+      "paragraphs": [
+        "From 2026-03-01 to 2026-03-31, this is a supporting period with intensity 0.72 and confidence 0.68.",
+        "Primary focus: structure and discipline.",
+        "Signals align across 2 systems (vedic and western)."
+      ],
+      "takeaways": [
+        "Lean into structure and discipline actions; aim for steady execution.",
+        "Prioritize decisions that compound over weeks, not days."
+      ],
+      "citations": [
+        {
+          "windowId": "cycle-abc123example",
+          "themes": ["window:2026-03", "structure_discipline"],
+          "systemsAligned": ["vedic", "western"],
+          "evidenceCycleIds": ["cycle-ved-1", "cycle-wes-2"]
+        }
+      ]
+    }
+  ],
+  "byDomain": {
+    "career": {
+      "headline": "Key career themes in this range",
+      "bullets": [
+        "2026-03-01 to 2026-03-31: supporting focus on structure and discipline.",
+        "Monitor for emerging signals."
+      ],
+      "topWindows": ["cycle-abc123example"]
+    },
+    "relationships": {
+      "headline": "No strong relationships windows in this range.",
+      "bullets": [
+        "No high-confidence windows in this domain.",
+        "Monitor for emerging signals."
+      ],
+      "topWindows": []
+    },
+    "growth": {
+      "headline": "No strong growth windows in this range.",
+      "bullets": [
+        "No high-confidence windows in this domain.",
+        "Monitor for emerging signals."
+      ],
+      "topWindows": []
+    }
+  },
+  "style": { "tone": "neutral", "readingLevel": "plain" }
+}

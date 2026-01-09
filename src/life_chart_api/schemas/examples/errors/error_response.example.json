@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "INVALID_INPUT",
+    "message": "Invalid year-month format.",
+    "details": [
+      { "path": "query.from", "issue": "must match YYYY-MM" }
+    ]
+  }
+}

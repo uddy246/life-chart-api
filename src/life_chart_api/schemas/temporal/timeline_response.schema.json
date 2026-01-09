@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TimelineResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "input", "range", "cycles"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version"],
+      "properties": {
+        "version": { "type": "string" }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["birth"],
+      "properties": {
+        "name": { "type": "string" },
+        "birth": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["date", "time", "timezone", "location"],
+          "properties": {
+            "date": { "type": "string", "format": "date" },
+            "time": {
+              "type": "string",
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d(:[0-5]\\d)?$"
+            },
+            "timezone": { "type": "string" },
+            "location": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["city", "region", "country", "lat", "lon"],
+              "properties": {
+                "city": { "type": "string" },
+                "region": { "type": "string" },
+                "country": { "type": "string" },
+                "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+                "lon": { "type": "number", "minimum": -180, "maximum": 180 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": "string", "pattern": "^\\d{4}-\\d{2}$" },
+        "to": { "type": "string", "pattern": "^\\d{4}-\\d{2}$" }
+      }
+    },
+    "cycles": {
+      "type": "array",
+      "items": { "$ref": "./cycle.schema.json" }
+    }
+  }
+}

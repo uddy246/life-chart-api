@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "version": "phase2.1"
+  },
+  "input": {
+    "birth": {
+      "date": "1999-02-26",
+      "time": "14:00:00",
+      "timezone": "UTC",
+      "location": {
+        "city": "Hyderabad",
+        "region": "Telangana",
+        "country": "India",
+        "lat": 17.385,
+        "lon": 78.4867
+      }
+    },
+    "name": "Example Person"
+  },
+  "range": {
+    "from": "2026-01",
+    "to": "2027-12"
+  },
+  "cycles": [
+    {
+      "cycleId": "cycle-789642131775",
+      "system": "chinese",
+      "kind": "scaffold",
+      "domain": "growth",
+      "themes": [
+        "scaffold"
+      ],
+      "start": "2026-01",
+      "end": "2027-12",
+      "intensity": 0.0,
+      "polarity": "neutral",
+      "evidence": [
+        {
+          "source": "chinese.scaffold",
+          "value": "phase2.1",
+          "weight": 0.0,
+          "note": "Scaffold placeholder."
+        }
+      ],
+      "notes": [
+        "scaffold"
+      ]
+    },
+    {
+      "cycleId": "cycle-5c2983bd9cbb",
+      "system": "numerology",
+      "kind": "scaffold",
+      "domain": "growth",
+      "themes": [
+        "scaffold"
+      ],
+      "start": "2026-01",
+      "end": "2027-12",
+      "intensity": 0.0,
+      "polarity": "neutral",
+      "evidence": [
+        {
+          "source": "numerology.scaffold",
+          "value": "phase2.1",
+          "weight": 0.0,
+          "note": "Scaffold placeholder."
+        }
+      ],
+      "notes": [
+        "scaffold"
+      ]
+    },
+    {
+      "cycleId": "cycle-523f46275966",
+      "system": "vedic",
+      "kind": "scaffold",
+      "domain": "growth",
+      "themes": [
+        "scaffold"
+      ],
+      "start": "2026-01",
+      "end": "2027-12",
+      "intensity": 0.0,
+      "polarity": "neutral",
+      "evidence": [
+        {
+          "source": "vedic.scaffold",
+          "value": "phase2.1",
+          "weight": 0.0,
+          "note": "Scaffold placeholder."
+        }
+      ],
+      "notes": [
+        "scaffold"
+      ]
+    },
+    {
+      "cycleId": "cycle-31827d4002ac",
+      "system": "western",
+      "kind": "scaffold",
+      "domain": "growth",
+      "themes": [
+        "scaffold"
+      ],
+      "start": "2026-01",
+      "end": "2027-12",
+      "intensity": 0.0,
+      "polarity": "neutral",
+      "evidence": [
+        {
+          "source": "western.scaffold",
+          "value": "phase2.1",
+          "weight": 0.0,
+          "note": "Scaffold placeholder."
+        }
+      ],
+      "notes": [
+        "scaffold"
+      ]
+    }
+  ]
+}
