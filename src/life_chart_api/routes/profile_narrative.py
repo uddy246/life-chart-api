@@ -4,11 +4,9 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-from life_chart_api.engines.intersection_engine import build_intersection_report, extract_signals
-from life_chart_api.inputs.query_parsers import parse_granularity, parse_include_csv, parse_tone, parse_ymd
+from life_chart_api.inputs.query_parsers import parse_tone, parse_ymd
 from life_chart_api.narrative.narrative_view import build_narrative_response
 from life_chart_api.routes.profile_forecast import build_forecast_from_payload
-from life_chart_api.routes.profile_compute import ProfileComputeRequest, compute_profile
 
 router = APIRouter(prefix="/profile", tags=["profile"])
 
@@ -83,20 +81,28 @@ def _apply_query_overrides(
     return payload, params.get("from"), params.get("to")
 
 
+def _get_query_param(params, key: str, use_query_prefix: bool) -> str | None:
+    return params.get(f"query.{key}") if use_query_prefix else params.get(key)
+
+
 @router.get("/narrative")
 def get_narrative(request: Request) -> dict:
     params = request.query_params
     use_query_prefix = any(key.startswith("query.") for key in params.keys())
     if use_query_prefix:
-        name = params.get("query.name")
-        dob = params.get("query.dob")
-        time = params.get("query.tob") or params.get("query.time") or "12:00"
-        timezone = params.get("query.timezone") or "Europe/London"
-        city = params.get("query.city") or "London"
-        region = params.get("query.region") or "England"
-        country = _normalize_country(params.get("query.country") or "UK")
-        lat = params.get("query.lat")
-        lon = params.get("query.lon")
+        name = _get_query_param(params, "name", use_query_prefix)
+        dob = _get_query_param(params, "dob", use_query_prefix)
+        time = (
+            _get_query_param(params, "tob", use_query_prefix)
+            or _get_query_param(params, "time", use_query_prefix)
+            or "12:00"
+        )
+        timezone = _get_query_param(params, "timezone", use_query_prefix) or "Europe/London"
+        city = _get_query_param(params, "city", use_query_prefix) or "London"
+        region = _get_query_param(params, "region", use_query_prefix) or "England"
+        country = _normalize_country(_get_query_param(params, "country", use_query_prefix) or "UK")
+        lat = _get_query_param(params, "lat", use_query_prefix)
+        lon = _get_query_param(params, "lon", use_query_prefix)
         if _should_use_default_london(city=city, region=region, country=country, lat=lat, lon=lon):
             lat = "51.5074"
             lon = "-0.1278"
@@ -112,15 +118,20 @@ def get_narrative(request: Request) -> dict:
             ]
             return JSONResponse(status_code=422, content={"detail": detail})
     else:
-        name = params.get("name")
-        dob = params.get("dob")
-        time = params.get("tob") or params.get("time") or params.get("h") or "12:00"
-        timezone = params.get("timezone") or "Europe/London"
-        city = params.get("city") or "London"
-        region = params.get("region") or "England"
-        country = _normalize_country(params.get("country") or "UK")
-        lat = params.get("lat")
-        lon = params.get("lon")
+        name = _get_query_param(params, "name", use_query_prefix)
+        dob = _get_query_param(params, "dob", use_query_prefix)
+        time = (
+            _get_query_param(params, "tob", use_query_prefix)
+            or _get_query_param(params, "time", use_query_prefix)
+            or _get_query_param(params, "h", use_query_prefix)
+            or "12:00"
+        )
+        timezone = _get_query_param(params, "timezone", use_query_prefix) or "Europe/London"
+        city = _get_query_param(params, "city", use_query_prefix) or "London"
+        region = _get_query_param(params, "region", use_query_prefix) or "England"
+        country = _normalize_country(_get_query_param(params, "country", use_query_prefix) or "UK")
+        lat = _get_query_param(params, "lat", use_query_prefix)
+        lon = _get_query_param(params, "lon", use_query_prefix)
         if _should_use_default_london(city=city, region=region, country=country, lat=lat, lon=lon):
             lat = "51.5074"
             lon = "-0.1278"
@@ -137,40 +148,33 @@ def get_narrative(request: Request) -> dict:
             return JSONResponse(status_code=422, content={"detail": detail})
 
     date = parse_ymd(dob, path="query.dob")
-    include_list = parse_include_csv(
-        params.get("include"),
-        allowed={"western", "vedic", "chinese"},
-        default="western,vedic,chinese",
-        path="query.include",
-    )
-    granularity_value = parse_granularity(params.get("granularity"), path="query.granularity")
+    include = _get_query_param(params, "include", use_query_prefix)
+    granularity = _get_query_param(params, "granularity", use_query_prefix)
+    tone_value = _get_query_param(params, "tone", use_query_prefix)
+    raw_from = _get_query_param(params, "from", use_query_prefix)
+    raw_to = _get_query_param(params, "to", use_query_prefix)
+    as_of = _get_query_param(params, "as_of", use_query_prefix)
 
-    birth = {
-        "date": date,
-        "time": time,
-        "timezone": timezone,
-        # TODO: replace default location once Lovable sends location fields.
-        "location": {
+    payload = NarrativeRequest.model_validate(
+        {
+            "name": name or "Unknown",
+            "date": date,
+            "time": time,
+            "timezone": timezone,
             "city": city,
             "region": region,
             "country": country,
-            "lat": float(lat) if lat is not None else None,
-            "lon": float(lon) if lon is not None else None,
-        },
-    }
-
-    payload = ProfileComputeRequest.model_validate({"name": name or "Unknown", "birth": birth})
-    profile = compute_profile(payload)
-    intersection = build_intersection_report(extract_signals(profile))
-    return {
-        "profile": profile,
-        "intersection": intersection.model_dump(),
-        "narrative": {
-            "granularity": granularity_value,
-            "include": include_list,
-            "note": "compat response",
-        },
-    }
+            "lat": float(lat) if lat is not None else 0.0,
+            "lon": float(lon) if lon is not None else 0.0,
+            "include": include,
+            "granularity": granularity or "month",
+            "tone": tone_value or "neutral",
+            "as_of": as_of,
+        }
+    )
+    forecast = build_forecast_from_payload(payload, raw_from=raw_from, raw_to=raw_to)
+    tone = parse_tone(payload.tone, path="query.tone")
+    return build_narrative_response(forecast, tone=tone)
 
 
 @router.post("/narrative")
