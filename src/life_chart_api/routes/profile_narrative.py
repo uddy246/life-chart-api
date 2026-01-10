@@ -13,6 +13,34 @@ from life_chart_api.routes.profile_compute import ProfileComputeRequest, compute
 router = APIRouter(prefix="/profile", tags=["profile"])
 
 
+def _normalize_country(country: str | None) -> str:
+    if not country:
+        return ""
+    normalized = country.strip()
+    lower = normalized.lower()
+    if lower in {"uk", "u.k.", "united kingdom", "great britain", "britain", "gb"}:
+        return "UK"
+    return normalized
+
+
+def _should_use_default_london(
+    *,
+    city: str | None,
+    region: str | None,
+    country: str | None,
+    lat: str | None,
+    lon: str | None,
+) -> bool:
+    if lat is not None or lon is not None:
+        return False
+    if (city or "").strip().lower() != "london":
+        return False
+    if (region or "").strip().lower() != "england":
+        return False
+    if (country or "").strip().lower() not in {"uk", "u.k.", "united kingdom", "great britain", "britain", "gb"}:
+        return False
+    return True
+
 class NarrativeRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
@@ -66,10 +94,10 @@ def get_narrative(request: Request) -> dict:
         timezone = params.get("query.timezone") or "Europe/London"
         city = params.get("query.city") or "London"
         region = params.get("query.region") or "England"
-        country = params.get("query.country") or "UK"
+        country = _normalize_country(params.get("query.country") or "UK")
         lat = params.get("query.lat")
         lon = params.get("query.lon")
-        if lat is None and lon is None and city == "London" and region == "England" and country == "UK":
+        if _should_use_default_london(city=city, region=region, country=country, lat=lat, lon=lon):
             lat = "51.5074"
             lon = "-0.1278"
         missing_fields = []
@@ -90,10 +118,10 @@ def get_narrative(request: Request) -> dict:
         timezone = params.get("timezone") or "Europe/London"
         city = params.get("city") or "London"
         region = params.get("region") or "England"
-        country = params.get("country") or "UK"
+        country = _normalize_country(params.get("country") or "UK")
         lat = params.get("lat")
         lon = params.get("lon")
-        if lat is None and lon is None and city == "London" and region == "England" and country == "UK":
+        if _should_use_default_london(city=city, region=region, country=country, lat=lat, lon=lon):
             lat = "51.5074"
             lon = "-0.1278"
         missing_fields = []

@@ -50,10 +50,11 @@ def parse_ymd(value: str, *, path: str) -> str:
 
 
 def parse_include_csv(value: str | None, *, allowed: Iterable[str], default: str, path: str) -> list[str]:
-    allowed_set = set(allowed)
+    allowed_set = {item.lower() for item in allowed}
     raw = value if value is not None else default
     items = [item.strip() for item in raw.split(",") if item.strip()]
-    invalid = [item for item in items if item not in allowed_set]
+    normalized = [item.lower() for item in items]
+    invalid = [item for item in normalized if item not in allowed_set]
     if invalid:
         raise APIError(
             code="INVALID_INPUT",
@@ -61,7 +62,7 @@ def parse_include_csv(value: str | None, *, allowed: Iterable[str], default: str
             details=[{"path": path, "issue": f"unsupported values: {', '.join(invalid)}"}],
             status_code=400,
         )
-    return items
+    return normalized
 
 
 def parse_granularity(value: str | None, *, path: str) -> str:

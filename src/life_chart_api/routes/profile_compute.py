@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 import os
+import logging
 
 import requests
 from fastapi import APIRouter, HTTPException
@@ -22,6 +23,7 @@ _GEOCODE_403_FALLBACKS: dict[str, tuple[float, float]] = {
     "london|england|uk": (51.5074, -0.1278),
     "hyderabad|telangana|india": (17.3850, 78.4867),
 }
+_LOGGER = logging.getLogger(__name__)
 
 
 def _cache_key(city: str, region: str | None, country: str) -> str:
@@ -73,6 +75,15 @@ def geocode_location(city: str, region: str | None, country: str) -> tuple[float
     return lat, lon
 
 
+def _try_geocode_location(city: str, region: str | None, country: str) -> tuple[float | None, float | None, bool]:
+    try:
+        lat, lon = geocode_location(city, region, country)
+        return lat, lon, False
+    except Exception as exc:
+        _LOGGER.warning("Geocoding unavailable: %s: %s", type(exc).__name__, exc)
+        return None, None, True
+
+
 class BirthLocation(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -122,6 +133,7 @@ class ProfileComputeRequest(BaseModel):
 
 @router.post("/compute")
 def compute_profile(payload: ProfileComputeRequest) -> dict[str, Any]:
+    warnings: list[str] = []
     if payload.name and payload.birth:
         name = payload.name
         birth = payload.birth.model_dump()
@@ -129,13 +141,23 @@ def compute_profile(payload: ProfileComputeRequest) -> dict[str, Any]:
         if not location.get("region"):
             location["region"] = ""
         if location.get("lat") is None or location.get("lon") is None:
-            lat, lon = geocode_location(location["city"], location.get("region"), location["country"])
-            location["lat"] = lat
-            location["lon"] = lon
+            lat, lon, geocode_failed = _try_geocode_location(
+                location["city"], location.get("region"), location["country"]
+            )
+            if geocode_failed:
+                warnings.append("geocoding_unavailable")
+                location["lat"] = 0.0
+                location["lon"] = 0.0
+            else:
+                location["lat"] = lat
+                location["lon"] = lon
     else:
         name = payload.full_name or "Unknown"
         if payload.lat is None or payload.lon is None:
-            lat, lon = geocode_location(payload.place_name or "", None, "")
+            lat, lon, geocode_failed = _try_geocode_location(payload.place_name or "", None, "")
+            if geocode_failed:
+                warnings.append("geocoding_unavailable")
+                lat, lon = 0.0, 0.0
         else:
             lat, lon = payload.lat, payload.lon
         birth = {
@@ -151,4 +173,7 @@ def compute_profile(payload: ProfileComputeRequest) -> dict[str, Any]:
             },
         }
 
-    return build_profile_response(name=name, birth=birth, numerology=None)
+    response = build_profile_response(name=name, birth=birth, numerology=None)
+    if warnings:
+        response["warnings"] = warnings
+    return response
