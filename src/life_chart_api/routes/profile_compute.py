@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+import os
 
 import requests
 from fastapi import APIRouter, HTTPException
@@ -11,7 +12,16 @@ from life_chart_api.schemas.profile_response_builder import build_profile_respon
 
 router = APIRouter(prefix="/profile", tags=["profile"])
 _GEOCODE_CACHE: dict[str, tuple[float, float]] = {}
-_GEOCODE_USER_AGENT = "life-chart-api/1.0 (contact: support@example.com)"
+_GEOCODE_USER_AGENT = "life-chart-api/1.0 (maintainer: life-chart-api team; contact: support@example.com)"
+_GEOCODE_HEADERS = {
+    "User-Agent": _GEOCODE_USER_AGENT,
+    "Accept": "application/json",
+    "Accept-Language": "en",
+}
+_GEOCODE_403_FALLBACKS: dict[str, tuple[float, float]] = {
+    "london|england|uk": (51.5074, -0.1278),
+    "hyderabad|telangana|india": (17.3850, 78.4867),
+}
 
 
 def _cache_key(city: str, region: str | None, country: str) -> str:
@@ -35,9 +45,20 @@ def geocode_location(city: str, region: str | None, country: str) -> tuple[float
         response = requests.get(
             "https://nominatim.openstreetmap.org/search",
             params={"q": query, "format": "json", "limit": 1},
-            headers={"User-Agent": _GEOCODE_USER_AGENT},
+            headers=_GEOCODE_HEADERS,
             timeout=10,
         )
+        if response.status_code == 403:
+            allow_fallback = os.getenv("ALLOW_FALLBACK_GEOCODE", "").strip().lower()
+            if allow_fallback in {"1", "true", "yes"}:
+                fallback = _GEOCODE_403_FALLBACKS.get(cache_key)
+                if fallback:
+                    _GEOCODE_CACHE[cache_key] = fallback
+                    return fallback
+            raise HTTPException(
+                status_code=502,
+                detail="Geocoding provider blocked the request (HTTP 403).",
+            )
         response.raise_for_status()
         data = response.json()
     except RequestException as exc:

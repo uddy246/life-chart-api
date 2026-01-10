@@ -16,6 +16,7 @@ from life_chart_api.numerology.adapter import build_numerology_response_v1
 from life_chart_api.numerology.schemas import NumerologyResponseV1
 from life_chart_api.routes.profile_compute import router as profile_compute_router
 from life_chart_api.routes.profile_forecast import router as profile_forecast_router
+from life_chart_api.routes.profile_intersection import router as profile_intersection_router
 from life_chart_api.routes.profile_narrative import router as profile_narrative_router
 from life_chart_api.routes.profile_stub import router as profile_router
 from life_chart_api.routes.profile_timeline import router as profile_timeline_router
@@ -42,6 +43,7 @@ app.include_router(profile_compute_router)
 app.include_router(profile_timeline_router)
 app.include_router(profile_forecast_router)
 app.include_router(profile_narrative_router)
+app.include_router(profile_intersection_router)
 settings = get_settings()
 configure_logging(settings.LOG_LEVEL)
 app.middleware("http")(create_rate_limit_middleware(max_requests=settings.RATE_LIMIT_PER_MIN))
