@@ -100,6 +100,56 @@ def _build_birth(payload: NarrativeRequest) -> dict[str, Any]:
     }
 
 
+def _fallback_narrative(forecast: dict[str, Any], tone: str) -> dict[str, Any]:
+    meta = forecast.get("meta")
+    if not isinstance(meta, dict):
+        meta = {}
+    range_info = meta.get("range")
+    if not isinstance(range_info, dict):
+        range_info = {}
+    range_from = range_info.get("from")
+    range_to = range_info.get("to")
+    if isinstance(range_from, str) and isinstance(range_to, str) and range_from and range_to:
+        range_line = f"Range covers {range_from} to {range_to}."
+    else:
+        range_line = "Range details unavailable."
+
+    overview_headline = "Narrative unavailable for this request."
+    overview = {
+        "headline": overview_headline,
+        "bullets": [
+            "Narrative details are temporarily unavailable.",
+            range_line,
+            "Please try again later.",
+        ],
+        "citations": [],
+    }
+    domain_entry = {
+        "headline": "Narrative unavailable.",
+        "bullets": ["Narrative details are unavailable.", "Monitor for updates."],
+        "topWindows": [],
+    }
+    response = {
+        "meta": {
+            "version": "phase3.2",
+            "granularity": meta.get("granularity", "month"),
+            "range": range_info,
+        },
+        "input": forecast.get("input", {}),
+        "overview": overview,
+        "windows": [],
+        "byDomain": {
+            "career": dict(domain_entry),
+            "relationships": dict(domain_entry),
+            "growth": dict(domain_entry),
+        },
+        "style": {"tone": tone, "readingLevel": "plain"},
+    }
+    if meta.get("as_of"):
+        response["meta"]["as_of"] = meta.get("as_of")
+    return response
+
+
 def _build_narrative_envelope(
     payload: NarrativeRequest,
     forecast: dict[str, Any],
@@ -110,8 +160,47 @@ def _build_narrative_envelope(
     profile = build_profile_response(name=payload.name or "Unknown", birth=birth, numerology=None)
     if warnings:
         profile["warnings"] = warnings
-    narrative = build_narrative_response(forecast, tone=tone)
-    return {"profile": profile, "intersection": profile.get("intersection", {}), "narrative": narrative}
+    try:
+        narrative = build_narrative_response(forecast, tone=tone)
+    except Exception:
+        narrative = _fallback_narrative(forecast, tone)
+    if not isinstance(narrative, dict):
+        narrative = _fallback_narrative(forecast, tone)
+    overview_value = narrative.get("overview")
+    headline = ""
+    if isinstance(overview_value, dict):
+        overview_headline = overview_value.get("headline")
+        if isinstance(overview_headline, str):
+            headline = overview_headline
+    elif isinstance(overview_value, str):
+        headline = overview_value
+    if not headline:
+        headline = "Narrative unavailable."
+    windows = narrative.get("windows")
+    if not isinstance(windows, list):
+        windows = []
+    if isinstance(overview_value, dict) or isinstance(overview_value, str):
+        overview = overview_value
+    else:
+        overview = headline
+
+    intersection = profile.get("intersection", {})
+    if not isinstance(intersection, dict):
+        intersection = {}
+    else:
+        intersection = dict(intersection)
+    intersection["overview"] = overview
+    intersection["headline"] = headline
+    intersection["windows"] = windows
+
+    return {
+        "profile": profile,
+        "intersection": intersection,
+        "narrative": narrative,
+        "overview": overview,
+        "headline": headline,
+        "windows": windows,
+    }
 
 
 def _get_query_param(params, key: str, use_query_prefix: bool) -> str | None:
