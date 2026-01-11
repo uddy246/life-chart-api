@@ -51,6 +51,74 @@ def _clean_themes(themes: list[str]) -> list[str]:
     return cleaned
 
 
+def _base_ui(themes: list[str]) -> dict[str, Any]:
+    cleaned = _clean_themes(themes)
+    primary = cleaned[0] if cleaned else "general_growth"
+    display = cleaned[:] if cleaned else [primary]
+    return {"primaryTheme": primary, "displayThemes": display, "isContinuation": False}
+
+
+def _promote_secondary(display: list[str], primary: str) -> list[str]:
+    for idx, theme in enumerate(display):
+        if theme != primary:
+            if idx == 0:
+                return list(display)
+            reordered = [theme]
+            for j, item in enumerate(display):
+                if j != idx:
+                    reordered.append(item)
+            return reordered
+    return list(display)
+
+
+def _apply_ui_continuation(windows: list[dict[str, Any]]) -> None:
+    prev_primary: str | None = None
+    for window in windows:
+        ui = window.get("ui")
+        if not isinstance(ui, dict):
+            ui = _base_ui(window.get("themes", []))
+        primary = ui.get("primaryTheme")
+        if not isinstance(primary, str) or not primary:
+            primary = "general_growth"
+            ui["primaryTheme"] = primary
+        display = ui.get("displayThemes")
+        if not isinstance(display, list) or not display:
+            display = [primary]
+        is_continuation = prev_primary == primary if prev_primary else False
+        ui["isContinuation"] = is_continuation
+        if is_continuation:
+            display = _promote_secondary(display, primary)
+        ui["displayThemes"] = display
+        window["ui"] = ui
+        prev_primary = primary
+
+
+def _select_top_windows(summaries: list[dict[str, Any]], top_n: int) -> list[dict[str, Any]]:
+    if top_n <= 0:
+        return []
+    selected: list[dict[str, Any]] = []
+    selected_ids: set[int] = set()
+    seen_themes: set[str] = set()
+
+    for window in summaries:
+        ui = window.get("ui", {})
+        primary = ui.get("primaryTheme", "general_growth")
+        if isinstance(primary, str) and primary not in seen_themes:
+            selected.append(window)
+            selected_ids.add(id(window))
+            seen_themes.add(primary)
+            if len(selected) >= top_n:
+                return selected
+
+    for window in summaries:
+        if id(window) in selected_ids:
+            continue
+        selected.append(window)
+        if len(selected) >= top_n:
+            break
+    return selected
+
+
 def _compute_confidence(cycle: dict[str, Any]) -> float:
     systems = _systems_aligned(cycle)
     systems_factor = min(1.0, len(systems) / 3.0)
@@ -63,6 +131,7 @@ def summarize_window(cycle: dict[str, Any]) -> dict[str, Any]:
     themes = list(cycle.get("themes", []))
     systems = _systems_aligned(cycle)
     evidence_ids = _evidence_cycle_ids(cycle)
+    ui = _base_ui(themes)
     confidence = cycle.get("confidence")
     if isinstance(confidence, (int, float)):
         confidence_value = round(clamp01(float(confidence)), 2)
@@ -78,6 +147,7 @@ def summarize_window(cycle: dict[str, Any]) -> dict[str, Any]:
         "themes": themes,
         "systemsAligned": systems,
         "evidenceCycleIds": evidence_ids,
+        "ui": ui,
     }
 
 
@@ -108,15 +178,29 @@ def build_summary_bullets(top_windows: list[dict[str, Any]], range_from: str, ra
         ]
 
     top = top_windows[0]
-    themes = _clean_themes(top.get("themes", []))
-    theme_text = ", ".join(themes[:3]) if themes else "general growth"
-    bullets = [
-        (
-            f"Top window {top.get('start')} to {top.get('end')} "
-            f"({top.get('polarity')}, intensity {top.get('intensity'):.2f}, "
-            f"confidence {top.get('confidence'):.2f}) themes: {theme_text}."
-        ),
-    ]
+    ui = top.get("ui", {}) if isinstance(top.get("ui"), dict) else {}
+    display_themes = ui.get("displayThemes")
+    if not isinstance(display_themes, list) or not display_themes:
+        display_themes = _clean_themes(top.get("themes", []))
+    if not display_themes:
+        display_themes = ["general_growth"]
+    theme_text = ", ".join(display_themes[:3])
+    if ui.get("isContinuation"):
+        bullets = [
+            (
+                f"Continuation: {top.get('start')} to {top.get('end')} "
+                f"({top.get('polarity')}, intensity {top.get('intensity'):.2f}, "
+                f"confidence {top.get('confidence'):.2f})."
+            ),
+        ]
+    else:
+        bullets = [
+            (
+                f"Top window {top.get('start')} to {top.get('end')} "
+                f"({top.get('polarity')}, intensity {top.get('intensity'):.2f}, "
+                f"confidence {top.get('confidence'):.2f}) themes: {theme_text}."
+            ),
+        ]
 
     all_themes: list[str] = []
     for window in top_windows:
@@ -150,7 +234,8 @@ def build_forecast_response(
     granularity = "quarter" if granularity == "quarter" else "month"
     summaries = [summarize_window(cycle) for cycle in intersection_cycles]
     summaries.sort(key=_sort_key)
-    top_windows = summaries[:top_n]
+    top_windows = _select_top_windows(summaries, top_n)
+    _apply_ui_continuation(top_windows)
 
     by_domain = {
         "career": [],
@@ -179,6 +264,9 @@ def build_forecast_response(
         "byDomain": by_domain,
         "summary": summary,
     }
+    # TEMPORARY: frontend compatibility shim for legacy fields.
+    response["overview"] = response["summary"]
+    response["windows"] = response["topWindows"]
     if name:
         response["input"]["name"] = name
     if as_of:

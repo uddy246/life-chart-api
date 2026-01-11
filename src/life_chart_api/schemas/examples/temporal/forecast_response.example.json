@@ -30,7 +30,30 @@
       "confidence": 0.68,
       "themes": ["window:2026-03", "structure_discipline", "tension"],
       "systemsAligned": ["vedic", "western"],
-      "evidenceCycleIds": ["cycle-ved-1", "cycle-wes-2"]
+      "evidenceCycleIds": ["cycle-ved-1", "cycle-wes-2"],
+      "ui": {
+        "primaryTheme": "structure_discipline",
+        "displayThemes": ["structure_discipline", "tension"],
+        "isContinuation": false
+      }
+    }
+  ],
+  "windows": [
+    {
+      "windowId": "cycle-abc123example",
+      "start": "2026-03-01",
+      "end": "2026-03-31",
+      "polarity": "supporting",
+      "intensity": 0.72,
+      "confidence": 0.68,
+      "themes": ["window:2026-03", "structure_discipline", "tension"],
+      "systemsAligned": ["vedic", "western"],
+      "evidenceCycleIds": ["cycle-ved-1", "cycle-wes-2"],
+      "ui": {
+        "primaryTheme": "structure_discipline",
+        "displayThemes": ["structure_discipline", "tension"],
+        "isContinuation": false
+      }
     }
   ],
   "byDomain": {
@@ -44,7 +67,12 @@
         "confidence": 0.68,
         "themes": ["window:2026-03", "structure_discipline", "tension"],
         "systemsAligned": ["vedic", "western"],
-        "evidenceCycleIds": ["cycle-ved-1", "cycle-wes-2"]
+        "evidenceCycleIds": ["cycle-ved-1", "cycle-wes-2"],
+        "ui": {
+          "primaryTheme": "structure_discipline",
+          "displayThemes": ["structure_discipline", "tension"],
+          "isContinuation": false
+        }
       }
     ],
     "relationships": [],
@@ -56,6 +84,11 @@
     "money": []
   },
   "summary": [
+    "Top window 2026-03-01 to 2026-03-31 (supporting, intensity 0.72, confidence 0.68) themes: structure_discipline, tension.",
+    "Most common theme across top windows: structure_discipline.",
+    "Polarity balance: 1 supporting, 0 challenging, 0 neutral."
+  ],
+  "overview": [
     "Top window 2026-03-01 to 2026-03-31 (supporting, intensity 0.72, confidence 0.68) themes: structure_discipline, tension.",
     "Most common theme across top windows: structure_discipline.",
     "Polarity balance: 1 supporting, 0 challenging, 0 neutral."

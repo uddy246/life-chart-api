@@ -61,6 +61,10 @@
       "type": "array",
       "items": { "$ref": "#/$defs/windowSummary" }
     },
+    "windows": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/windowSummary" }
+    },
     "byDomain": {
       "type": "object",
       "additionalProperties": false,
@@ -85,7 +89,8 @@
         "money": { "type": "array", "items": { "$ref": "#/$defs/windowSummary" } }
       }
     },
-    "summary": { "type": "array", "items": { "type": "string" } }
+    "summary": { "type": "array", "items": { "type": "string" } },
+    "overview": { "type": "array", "items": { "type": "string" } }
   },
   "$defs": {
     "windowSummary": {
@@ -117,7 +122,17 @@
           "type": "array",
           "items": { "type": "string", "enum": ["western", "vedic", "chinese", "numerology"] }
         },
-        "evidenceCycleIds": { "type": "array", "items": { "type": "string" } }
+        "evidenceCycleIds": { "type": "array", "items": { "type": "string" } },
+        "ui": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["primaryTheme", "displayThemes", "isContinuation"],
+          "properties": {
+            "primaryTheme": { "type": "string" },
+            "displayThemes": { "type": "array", "items": { "type": "string" } },
+            "isContinuation": { "type": "boolean" }
+          }
+        }
       }
     }
   }
