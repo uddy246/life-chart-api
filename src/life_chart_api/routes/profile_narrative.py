@@ -209,8 +209,30 @@ def _build_fallback_narrative(
     return response
 
 
-def _extract_compat_fields(narrative: dict[str, Any]) -> tuple[Any, str, list]:
+def _summarize_overview(overview_value: Any) -> tuple[str, dict[str, Any] | None]:
+    if isinstance(overview_value, dict):
+        bullets = overview_value.get("bullets")
+        if isinstance(bullets, list):
+            bullet_texts = [item for item in bullets if isinstance(item, str)]
+            if bullet_texts:
+                return " ".join(bullet_texts[:3]), overview_value
+        text_value = overview_value.get("text")
+        if isinstance(text_value, str):
+            return text_value, overview_value
+        return "", overview_value
+    if isinstance(overview_value, list):
+        bullet_texts = [item for item in overview_value if isinstance(item, str)]
+        if bullet_texts:
+            return " ".join(bullet_texts[:3]), None
+        return "", None
+    if isinstance(overview_value, str):
+        return overview_value, None
+    return "", None
+
+
+def _extract_compat_fields(narrative: dict[str, Any]) -> tuple[str, str, list, dict[str, Any] | None]:
     overview_value = narrative.get("overview")
+    overview_text, overview_data = _summarize_overview(overview_value)
     headline = ""
     if isinstance(overview_value, dict):
         overview_headline = overview_value.get("headline")
@@ -222,12 +244,14 @@ def _extract_compat_fields(narrative: dict[str, Any]) -> tuple[Any, str, list]:
         narrative_headline = narrative.get("headline")
         if isinstance(narrative_headline, str):
             headline = narrative_headline
+    if not isinstance(headline, str):
+        headline = ""
 
     windows = narrative.get("windows")
     if not isinstance(windows, list):
         windows = []
 
-    return overview_value, headline, windows
+    return overview_text, headline, windows, overview_data
 
 
 def _build_narrative_envelope(
@@ -252,7 +276,7 @@ def _build_narrative_envelope(
     if warnings:
         profile["warnings"] = warnings
 
-    overview, headline, windows = _extract_compat_fields(narrative)
+    overview, headline, windows, overview_data = _extract_compat_fields(narrative)
 
     intersection = profile.get("intersection", {})
     if not isinstance(intersection, dict):
@@ -262,9 +286,11 @@ def _build_narrative_envelope(
     intersection["overview"] = overview
     intersection["headline"] = headline
     intersection["windows"] = windows
+    if overview_data is not None:
+        intersection["overviewData"] = overview_data
     profile["intersection"] = intersection
 
-    return {
+    response = {
         "profile": profile,
         "intersection": intersection,
         "narrative": narrative,
@@ -272,6 +298,10 @@ def _build_narrative_envelope(
         "headline": headline,
         "windows": windows,
     }
+    if overview_data is not None:
+        response["overviewData"] = overview_data
+    return response
+
 
 
 def _get_query_param(params, key: str, use_query_prefix: bool) -> str | None:
