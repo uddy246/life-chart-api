@@ -71,6 +71,35 @@
         "tone": { "type": "string", "enum": ["neutral", "direct", "reflective"] },
         "readingLevel": { "type": "string", "enum": ["plain"] }
       }
+    },
+    "deepReading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "sections", "safety"],
+      "properties": {
+        "summary": { "type": "string" },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title", "body"],
+            "properties": {
+              "title": { "type": "string" },
+              "body": { "type": "string" }
+            }
+          }
+        },
+        "safety": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["constraintsApplied", "groundingMode"],
+          "properties": {
+            "constraintsApplied": { "type": "boolean" },
+            "groundingMode": { "type": "string" }
+          }
+        }
+      }
     }
   },
   "$defs": {
@@ -127,9 +156,26 @@
           "minItems": 2,
           "maxItems": 4
         },
+        "whyThisWindow": { "type": "string" },
         "citations": {
           "type": "array",
           "items": { "$ref": "#/$defs/citation" }
+        },
+        "identityContext": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "linked_identity_label",
+            "linked_tension_axis",
+            "activated_shadows",
+            "alignment_actions"
+          ],
+          "properties": {
+            "linked_identity_label": { "type": "string" },
+            "linked_tension_axis": { "type": "string" },
+            "activated_shadows": { "type": "array", "items": { "type": "string" } },
+            "alignment_actions": { "type": "array", "items": { "type": "string" } }
+          }
         }
       }
     },

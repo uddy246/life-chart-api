@@ -5,7 +5,10 @@ from typing import Any
 from fastapi import APIRouter, Request
 from pydantic import BaseModel, ConfigDict, Field
 
+from life_chart_api.convergent.profile_compute import compute_convergent_profile
+from life_chart_api.convergent.window_enrichment import enrich_windows_with_identity
 from life_chart_api.inputs.query_parsers import parse_tone, parse_ymd
+from life_chart_api.narrative.deep_reading import synthesize_deep_reading
 from life_chart_api.narrative.narrative_view import build_narrative_response
 from life_chart_api.routes.profile_compute import _try_geocode_location
 from life_chart_api.routes.profile_forecast import build_forecast_from_payload
@@ -275,6 +278,34 @@ def _build_narrative_envelope(
         narrative = _build_fallback_narrative(payload, tone, forecast)
     if warnings:
         profile["warnings"] = warnings
+
+    systems = profile.get("systems")
+    if isinstance(systems, dict):
+        convergent_profile_doc = compute_convergent_profile(
+            western=systems.get("western") if isinstance(systems.get("western"), dict) else None,
+            vedic=systems.get("vedic") if isinstance(systems.get("vedic"), dict) else None,
+            chinese=systems.get("chinese") if isinstance(systems.get("chinese"), dict) else None,
+            numerology=systems.get("numerology") if isinstance(systems.get("numerology"), dict) else None,
+        )
+    else:
+        convergent_profile_doc = compute_convergent_profile(None, None, None, None)
+
+    if isinstance(narrative, dict):
+        narrative_windows = narrative.get("windows")
+        enriched_windows: list[dict] | None = None
+        if isinstance(narrative_windows, list):
+            enriched_windows = enrich_windows_with_identity(
+                narrative_windows,
+                convergent_profile_doc,
+            )
+            narrative["windows"] = enriched_windows
+        deep_reading = synthesize_deep_reading(
+            convergent_profile_doc,
+            enriched_windows or [],
+            tone=tone,
+            enable_llm=False,
+        )
+        narrative["deepReading"] = deep_reading
 
     overview, headline, windows, overview_data = _extract_compat_fields(narrative)
 
