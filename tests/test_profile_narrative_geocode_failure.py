@@ -14,9 +14,9 @@ def test_profile_narrative_geocode_failure_returns_200(monkeypatch):
         "dob": "1999-02-26",
         "time": "14:00",
         "timezone": "UTC",
-        "city": "London",
-        "region": "England",
-        "country": "United Kingdom",
+        "city": "Hyderabad",
+        "region": "Telangana",
+        "country": "India",
         "include": "western,vedic,chinese",
         "granularity": "month",
     }

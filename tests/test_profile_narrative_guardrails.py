@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from life_chart_api.main import app
 from life_chart_api.routes.profile_forecast import ForecastRequest, get_forecast
-from life_chart_api.routes.profile_narrative import NarrativeRequest, get_narrative
+from tests.asgi_client import call_app
 
 
 def _get_narrative(params: dict) -> dict:
-    model = NarrativeRequest.model_validate(params)
-    return get_narrative(model)
+    status, _, payload = call_app(app, "GET", "/profile/narrative", params=params)
+    assert status == 200
+    return payload.get("narrative", {})
 
 
 def _get_forecast(params: dict) -> dict:

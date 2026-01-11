@@ -1,22 +1,11 @@
-try:
-    from fastapi.testclient import TestClient
-    _HAS_TESTCLIENT = True
-except RuntimeError:
-    TestClient = None
-    _HAS_TESTCLIENT = False
-
 from life_chart_api.main import app
-from life_chart_api.routes.profile_narrative import NarrativeRequest, get_narrative
+from tests.asgi_client import call_app
 
 
 def _get_narrative(params: dict) -> dict:
-    if _HAS_TESTCLIENT:
-        client = TestClient(app)
-        response = client.get("/profile/narrative", params=params)
-        assert response.status_code == 200
-        return response.json()
-    model = NarrativeRequest.model_validate(params)
-    return get_narrative(model)
+    status, _, payload = call_app(app, "GET", "/profile/narrative", params=params)
+    assert status == 200
+    return payload
 
 
 def test_profile_narrative_deterministic():
@@ -39,4 +28,4 @@ def test_profile_narrative_deterministic():
     response_a = _get_narrative(params)
     response_b = _get_narrative(params)
 
-    assert response_a == response_b
+    assert response_a.get("narrative") == response_b.get("narrative")

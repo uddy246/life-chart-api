@@ -3,7 +3,8 @@ from pathlib import Path
 
 import swisseph as swe
 
-from life_chart_api.routes.profile_narrative import NarrativeRequest, get_narrative
+from life_chart_api.main import app
+from tests.asgi_client import call_app
 
 
 def _normalize(payload: dict) -> dict:
@@ -48,8 +49,9 @@ def test_narrative_golden_snapshot_v1():
         "tone": "neutral",
     }
     swe.set_sid_mode(swe.SIDM_LAHIRI)
-    model = NarrativeRequest.model_validate(params)
-    response = get_narrative(model)
+    status, _, payload = call_app(app, "GET", "/profile/narrative", params=params)
+    assert status == 200
+    response = payload.get("narrative", {})
 
     fixture_path = Path(__file__).resolve().parent / "fixtures" / "narrative_golden_v1.json"
     expected = json.loads(fixture_path.read_text(encoding="utf-8"))

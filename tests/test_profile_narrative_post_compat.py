@@ -2,20 +2,10 @@ import json
 from pathlib import Path
 
 import jsonschema
-try:
-    from fastapi.testclient import TestClient
-    _HAS_TESTCLIENT = True
-except RuntimeError:
-    TestClient = None
-    _HAS_TESTCLIENT = False
 from referencing import Registry, Resource
 
 from life_chart_api.main import app
-from life_chart_api.routes.profile_narrative import (
-    NarrativeRequest,
-    get_narrative,
-    post_narrative,
-)
+from tests.asgi_client import call_app
 
 
 def _narrative_registry(schema_path: Path) -> Registry:
@@ -31,23 +21,15 @@ def _narrative_registry(schema_path: Path) -> Registry:
 
 
 def _get_narrative(params: dict) -> dict:
-    if _HAS_TESTCLIENT:
-        client = TestClient(app)
-        response = client.get("/profile/narrative", params=params)
-        assert response.status_code == 200
-        return response.json()
-    model = NarrativeRequest.model_validate(params)
-    return get_narrative(model)
+    status, _, payload = call_app(app, "GET", "/profile/narrative", params=params)
+    assert status == 200
+    return payload
 
 
 def _post_narrative(params: dict) -> dict:
-    if _HAS_TESTCLIENT:
-        client = TestClient(app)
-        response = client.post("/profile/narrative", json=params)
-        assert response.status_code == 200
-        return response.json()
-    model = NarrativeRequest.model_validate(params)
-    return post_narrative(model)
+    status, _, payload = call_app(app, "POST", "/profile/narrative", body=params)
+    assert status == 200
+    return payload
 
 
 def _base_params() -> dict:
@@ -86,14 +68,14 @@ def test_profile_narrative_post_schema_valid():
     registry = _narrative_registry(schema_path)
     validator_cls = jsonschema.validators.validator_for(schema)
     validator = validator_cls(schema, registry=registry)
-    validator.validate(response_json)
+    validator.validate(response_json.get("narrative", {}))
 
 
 def test_profile_narrative_post_deterministic():
     params = _base_params()
     response_a = _post_narrative(params)
     response_b = _post_narrative(params)
-    assert response_a == response_b
+    assert response_a.get("narrative") == response_b.get("narrative")
 
 
 def test_profile_narrative_post_changes_with_input():
@@ -101,15 +83,15 @@ def test_profile_narrative_post_changes_with_input():
     params_b = {**_base_params(), "date": "1999-03-01", "time": "09:30:00"}
     response_a = _post_narrative(params_a)
     response_b = _post_narrative(params_b)
-    assert response_a != response_b
+    assert response_a.get("narrative") != response_b.get("narrative")
 
 
 def test_profile_narrative_post_matches_get():
     params = _base_params()
     response_get = _get_narrative(params)
     response_post = _post_narrative(params)
-    assert response_get == response_post
+    assert response_get.get("narrative") == response_post.get("narrative")
 
-    get_ids = [window.get("windowId") for window in response_get.get("windows", [])]
-    post_ids = [window.get("windowId") for window in response_post.get("windows", [])]
+    get_ids = [window.get("windowId") for window in response_get.get("narrative", {}).get("windows", [])]
+    post_ids = [window.get("windowId") for window in response_post.get("narrative", {}).get("windows", [])]
     assert get_ids == post_ids
