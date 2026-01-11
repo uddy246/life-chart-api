@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Request
 from pydantic import BaseModel, ConfigDict, Field
 
 from life_chart_api.inputs.query_parsers import parse_tone, parse_ymd
@@ -100,72 +99,117 @@ def _build_birth(payload: NarrativeRequest) -> dict[str, Any]:
     }
 
 
-def _fallback_narrative(forecast: dict[str, Any], tone: str) -> dict[str, Any]:
-    meta = forecast.get("meta")
-    if not isinstance(meta, dict):
-        meta = {}
-    range_info = meta.get("range")
-    if not isinstance(range_info, dict):
-        range_info = {}
-    range_from = range_info.get("from")
-    range_to = range_info.get("to")
-    if isinstance(range_from, str) and isinstance(range_to, str) and range_from and range_to:
-        range_line = f"Range covers {range_from} to {range_to}."
-    else:
-        range_line = "Range details unavailable."
+_FALLBACK_HEADLINE = "Narrative unavailable."
 
-    overview_headline = "Narrative unavailable for this request."
+
+def _fallback_summary(range_from: str, range_to: str) -> list[str]:
+    return [
+        "Narrative unavailable for the selected range.",
+        f"Range covers {range_from} to {range_to}.",
+        "No high-confidence windows available.",
+    ]
+
+
+def _build_minimal_fallback_narrative(
+    payload: NarrativeRequest,
+    tone: str,
+    *,
+    range_from: str,
+    range_to: str,
+    granularity: str,
+    as_of: str | None,
+    summary: list[str],
+) -> dict[str, Any]:
+    birth = _build_birth(payload)
     overview = {
-        "headline": overview_headline,
-        "bullets": [
-            "Narrative details are temporarily unavailable.",
-            range_line,
-            "Please try again later.",
-        ],
+        "headline": _FALLBACK_HEADLINE,
+        "bullets": summary[:6],
         "citations": [],
     }
-    domain_entry = {
-        "headline": "Narrative unavailable.",
-        "bullets": ["Narrative details are unavailable.", "Monitor for updates."],
-        "topWindows": [],
-    }
+    domain_bullets = summary[:2]
+    by_domain = {}
+    for domain in ("career", "relationships", "growth"):
+        by_domain[domain] = {
+            "headline": f"No strong {domain} windows in this range.",
+            "bullets": domain_bullets,
+            "topWindows": [],
+        }
     response = {
         "meta": {
             "version": "phase3.2",
-            "granularity": meta.get("granularity", "month"),
-            "range": range_info,
+            "granularity": granularity,
+            "range": {"from": range_from, "to": range_to},
         },
-        "input": forecast.get("input", {}),
+        "input": {"name": payload.name or "Unknown", "birth": birth},
         "overview": overview,
         "windows": [],
-        "byDomain": {
-            "career": dict(domain_entry),
-            "relationships": dict(domain_entry),
-            "growth": dict(domain_entry),
-        },
+        "byDomain": by_domain,
         "style": {"tone": tone, "readingLevel": "plain"},
     }
-    if meta.get("as_of"):
-        response["meta"]["as_of"] = meta.get("as_of")
+    if as_of:
+        response["meta"]["as_of"] = as_of
     return response
 
 
-def _build_narrative_envelope(
+def _build_fallback_narrative(
     payload: NarrativeRequest,
-    forecast: dict[str, Any],
     tone: str,
-    warnings: list[str] | None = None,
+    forecast: dict[str, Any] | None,
 ) -> dict[str, Any]:
     birth = _build_birth(payload)
-    profile = build_profile_response(name=payload.name or "Unknown", birth=birth, numerology=None)
-    if warnings:
-        profile["warnings"] = warnings
+    meta = forecast.get("meta") if isinstance(forecast, dict) else {}
+    meta_range = meta.get("range") if isinstance(meta, dict) else {}
+    range_from = meta_range.get("from") if isinstance(meta_range, dict) else None
+    range_to = meta_range.get("to") if isinstance(meta_range, dict) else None
+    granularity = meta.get("granularity") if isinstance(meta, dict) else None
+    as_of = meta.get("as_of") if isinstance(meta, dict) else None
+    summary = forecast.get("summary") if isinstance(forecast, dict) else None
+    if not isinstance(summary, list) or len(summary) < 3:
+        summary = _fallback_summary(range_from or payload.from_, range_to or payload.to)
+
+    forecast_stub = {
+        "meta": {
+            "version": "phase2.4",
+            "granularity": granularity or payload.granularity or "month",
+            "range": {
+                "from": range_from or payload.from_,
+                "to": range_to or payload.to,
+            },
+        },
+        "input": {"name": payload.name or "Unknown", "birth": birth},
+        "topWindows": [],
+        "summary": summary,
+    }
+    if as_of:
+        forecast_stub["meta"]["as_of"] = as_of
     try:
-        narrative = build_narrative_response(forecast, tone=tone)
+        response = build_narrative_response(forecast_stub, tone=tone)
     except Exception:
-        narrative = _fallback_narrative(forecast, tone)
-    if not isinstance(narrative, dict):
-        narrative = _fallback_narrative(forecast, tone)
+        return _build_minimal_fallback_narrative(
+            payload,
+            tone,
+            range_from=forecast_stub["meta"]["range"]["from"],
+            range_to=forecast_stub["meta"]["range"]["to"],
+            granularity=forecast_stub["meta"]["granularity"],
+            as_of=as_of,
+            summary=summary,
+        )
+    overview = response.get("overview")
+    if isinstance(overview, dict):
+        overview["headline"] = _FALLBACK_HEADLINE
+        bullets = overview.get("bullets")
+        if not isinstance(bullets, list) or len(bullets) < 3:
+            overview["bullets"] = _fallback_summary(
+                forecast_stub["meta"]["range"]["from"],
+                forecast_stub["meta"]["range"]["to"],
+            )
+        citations = overview.get("citations")
+        if not isinstance(citations, list):
+            overview["citations"] = []
+    return response
+
+
+def _extract_compat_fields(narrative: dict[str, Any]) -> tuple[Any, str, list]:
     overview_value = narrative.get("overview")
     headline = ""
     if isinstance(overview_value, dict):
@@ -175,14 +219,40 @@ def _build_narrative_envelope(
     elif isinstance(overview_value, str):
         headline = overview_value
     if not headline:
-        headline = "Narrative unavailable."
+        narrative_headline = narrative.get("headline")
+        if isinstance(narrative_headline, str):
+            headline = narrative_headline
+
     windows = narrative.get("windows")
     if not isinstance(windows, list):
         windows = []
-    if isinstance(overview_value, dict) or isinstance(overview_value, str):
-        overview = overview_value
-    else:
-        overview = headline
+
+    return overview_value, headline, windows
+
+
+def _build_narrative_envelope(
+    payload: NarrativeRequest,
+    forecast: dict[str, Any],
+    tone: str,
+    warnings: list[str] | None = None,
+) -> dict[str, Any]:
+    warnings = list(warnings or [])
+    birth = _build_birth(payload)
+    profile = build_profile_response(name=payload.name or "Unknown", birth=birth, numerology=None)
+    try:
+        narrative = build_narrative_response(forecast, tone=tone)
+    except Exception:
+        if "narrative_unavailable" not in warnings:
+            warnings.append("narrative_unavailable")
+        narrative = _build_fallback_narrative(payload, tone, forecast)
+    if not isinstance(narrative, dict):
+        if "narrative_unavailable" not in warnings:
+            warnings.append("narrative_unavailable")
+        narrative = _build_fallback_narrative(payload, tone, forecast)
+    if warnings:
+        profile["warnings"] = warnings
+
+    overview, headline, windows = _extract_compat_fields(narrative)
 
     intersection = profile.get("intersection", {})
     if not isinstance(intersection, dict):
@@ -192,6 +262,7 @@ def _build_narrative_envelope(
     intersection["overview"] = overview
     intersection["headline"] = headline
     intersection["windows"] = windows
+    profile["intersection"] = intersection
 
     return {
         "profile": profile,
@@ -211,6 +282,7 @@ def _get_query_param(params, key: str, use_query_prefix: bool) -> str | None:
 def get_narrative(request: Request) -> dict:
     params = request.query_params
     use_query_prefix = any(key.startswith("query.") for key in params.keys())
+    warnings: list[str] = []
     if use_query_prefix:
         name = _get_query_param(params, "name", use_query_prefix)
         dob = (
@@ -235,11 +307,11 @@ def get_narrative(request: Request) -> dict:
         if not dob:
             missing_fields.append("dob")
         if missing_fields:
-            detail = [
-                {"loc": ["query", field], "msg": "Field required", "type": "value_error.missing"}
-                for field in missing_fields
-            ]
-            return JSONResponse(status_code=422, content={"detail": detail})
+            warnings.extend(f"missing_{field}" for field in missing_fields)
+        if not name:
+            name = "Unknown"
+        if not dob:
+            dob = "2000-01-01"
     else:
         name = _get_query_param(params, "name", use_query_prefix)
         dob = (
@@ -265,13 +337,11 @@ def get_narrative(request: Request) -> dict:
         if not dob:
             missing_fields.append("dob")
         if missing_fields:
-            detail = [
-                {"loc": ["query", field], "msg": "Field required", "type": "value_error.missing"}
-                for field in missing_fields
-            ]
-            return JSONResponse(status_code=422, content={"detail": detail})
-
-    warnings: list[str] = []
+            warnings.extend(f"missing_{field}" for field in missing_fields)
+        if not name:
+            name = "Unknown"
+        if not dob:
+            dob = "2000-01-01"
     if lat is None or lon is None:
         if _should_use_default_london(city=city, region=region, country=country, lat=lat, lon=lon):
             lat = "51.5074"
