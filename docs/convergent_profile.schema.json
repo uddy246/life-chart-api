@@ -1,0 +1,49 @@
+{
+  "convergent_profile": {
+    "core_operating_identity": {
+      "label": "",
+      "one_line_definition": "",
+      "expanded_summary": ""
+    },
+    "identity_sources": {
+      "chinese": [],
+      "vedic": [],
+      "western": [],
+      "numerology": []
+    },
+    "internal_engine": {
+      "perception": { "mode": "", "description": "" },
+      "evaluation": { "mode": "", "description": "" },
+      "action": { "mode": "", "description": "" },
+      "authority_building": { "mode": "", "description": "" }
+    },
+    "central_life_tension": {
+      "axis": "",
+      "description": "",
+      "failure_expression": "",
+      "maturity_expression": ""
+    },
+    "competence_signature": {
+      "primary_role": "",
+      "secondary_role": "",
+      "capabilities": []
+    },
+    "shadow_profile": [],
+    "relationship_dynamics": {
+      "naturally_provides": [],
+      "requires_to_thrive": [],
+      "common_failure_pattern": ""
+    },
+    "career_and_power_trajectory": {
+      "winning_conditions": [],
+      "growth_curve": "",
+      "wealth_logic": ""
+    },
+    "strategic_alignment": {
+      "leverage_points": [],
+      "protective_structures": [],
+      "anti_patterns": []
+    },
+    "final_convergent_statement": ""
+  }
+}
