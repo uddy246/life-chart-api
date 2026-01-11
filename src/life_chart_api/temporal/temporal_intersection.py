@@ -138,8 +138,9 @@ def build_temporal_intersection_cycles(
         window_start = window["start"]
         window_end = window["end"]
         window_id = window["id"]
+        window_days = (window_end - window_start).days + 1
 
-        overlapping: list[dict[str, Any]] = []
+        overlapping: list[tuple[dict[str, Any], date, date]] = []
         for cycle in all_cycles:
             start_raw = cycle.get("start")
             end_raw = cycle.get("end")
@@ -148,7 +149,7 @@ def build_temporal_intersection_cycles(
             cycle_start = _parse_date(start_raw, end=False)
             cycle_end = _parse_date(end_raw, end=True)
             if cycle_start <= window_end and cycle_end >= window_start:
-                overlapping.append(cycle)
+                overlapping.append((cycle, cycle_start, cycle_end))
 
         if not overlapping:
             continue
@@ -161,12 +162,19 @@ def build_temporal_intersection_cycles(
         systems_present: set[str] = set()
         weighted_cycles: list[tuple[dict[str, Any], float, int]] = []
 
-        for cycle in overlapping:
+        for cycle, cycle_start, cycle_end in overlapping:
             system = cycle.get("system")
             if system not in _SYSTEM_WEIGHTS:
                 continue
             intensity = float(cycle.get("intensity", 0.0))
-            weight = _SYSTEM_WEIGHTS[system] * intensity
+            overlap_days = max(
+                0,
+                (min(cycle_end, window_end) - max(cycle_start, window_start)).days + 1,
+            )
+            overlap_factor = overlap_days / window_days if window_days > 0 else 0.0
+            if overlap_factor <= 0.0:
+                continue
+            weight = _SYSTEM_WEIGHTS[system] * intensity * overlap_factor
             polarity = cycle.get("polarity", "neutral")
             sign = 0
             if polarity == "supporting":
@@ -209,7 +217,7 @@ def build_temporal_intersection_cycles(
 
         total_weight = sum(weight for _, weight, _ in weighted_cycles)
         net = sum(weight * sign for _, weight, sign in weighted_cycles)
-        magnitude = clamp01(total_weight)
+        magnitude = clamp01(total_weight / max(0.75, float(len(systems_present)) * 0.35))
         intensity = clamp01(0.5 * magnitude + 0.5 * abs(net))
         if net > 0.10:
             polarity = "supporting"
@@ -273,6 +281,7 @@ def build_temporal_intersection_cycles(
                 "themes": themes,
                 "start": start_str,
                 "end": end_str,
+                "confidence": confidence,
                 "intensity": intensity,
                 "polarity": polarity,
                 "evidence": evidence,

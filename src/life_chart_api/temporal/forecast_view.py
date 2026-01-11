@@ -63,13 +63,18 @@ def summarize_window(cycle: dict[str, Any]) -> dict[str, Any]:
     themes = list(cycle.get("themes", []))
     systems = _systems_aligned(cycle)
     evidence_ids = _evidence_cycle_ids(cycle)
+    confidence = cycle.get("confidence")
+    if isinstance(confidence, (int, float)):
+        confidence_value = round(clamp01(float(confidence)), 2)
+    else:
+        confidence_value = _compute_confidence(cycle)
     return {
         "windowId": _window_id(cycle),
         "start": cycle.get("start"),
         "end": cycle.get("end"),
         "polarity": cycle.get("polarity"),
         "intensity": float(cycle.get("intensity", 0.0)),
-        "confidence": _compute_confidence(cycle),
+        "confidence": confidence_value,
         "themes": themes,
         "systemsAligned": systems,
         "evidenceCycleIds": evidence_ids,
